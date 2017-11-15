@@ -39,6 +39,7 @@ function* action() {
         },
         routerConfig: {
             base: '/dynamic-segment/',
+            mode: 'history',
             routes: [{
                     path: '/'
                 },
