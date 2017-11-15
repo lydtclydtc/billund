@@ -4,7 +4,19 @@ const isDev = (process.env.LEGO_ENV === 'development' || process.env.BILLUND_ENV
 
 const _ = require('lodash');
 const legoUtils = require('billund-utils');
+const decache = require('decache');
 
+const debug = require('debug');
+const gaze = require('gaze');
+const log = debug('billund-action-binder:info');
+
+/*
+    记录的action路径
+    watch变化的文件路径
+    router实例
+ */
+let storeActionPaths = null;
+let watchFiles = [];
 let routerIns = null;
 
 /**
@@ -12,7 +24,7 @@ let routerIns = null;
  *
  * @param  {Array} actions - controler层的列表
  */
-function initRouter(actions) {
+function initRouter() {
     const url2Path = {};
     const router = require('koa-router')();
 
@@ -31,7 +43,7 @@ function initRouter(actions) {
         router.register(url, ['get', 'post'], [action]);
     }
 
-    actions.forEach((action) => {
+    (storeActionPaths || []).forEach((action) => {
         let actionConfig = null;
         try {
             actionConfig = require(action);
@@ -53,6 +65,70 @@ function initRouter(actions) {
 }
 
 /**
+ * 更新widgets信息
+ */
+function updateRouter() {
+    watchFiles.forEach((file) => {
+        decache(file);
+        console.log(`${file} decache.`);
+    });
+    initRouter();
+    storeActionPaths.forEach((action) => {
+        log(`${action} action update.`);
+    });
+}
+
+/**
+ * watch文件的变更
+ */
+function watchFilesChange() {
+    watchFiles.forEach((file) => {
+        gaze(file, function(err) {
+            if (err) {
+                console.warn(err);
+                console.log(`watch ${file} file fail`);
+                return;
+            }
+            this.on('changed', () => {
+                updateRouter();
+            });
+        });
+    });
+}
+
+/**
+ * 收集当前文件和它的引用文件
+ *
+ * @param  {String} pathname - 当前文件
+ */
+function collectFileAndChildren(pathname) {
+    const findedIndex = watchFiles.findIndex((filePath) => {
+        return filePath === pathname;
+    });
+    const isExisted = findedIndex !== -1;
+    if (!isExisted) {
+        const list = [pathname];
+        let children = [];
+        try {
+            children = require.cache[pathname].children;
+        } catch (e) {
+            children = [];
+        }
+        if (children && children.length) {
+            children.forEach((child) => {
+                const childFindedIndex = watchFiles.findIndex((filePath) => {
+                    return filePath === child.filename;
+                });
+                if (childFindedIndex === -1) {
+                    collectFileAndChildren(child.filename);
+                }
+            });
+        }
+        watchFiles = watchFiles.concat(list);
+    }
+}
+
+/**
  * 绑定对应的action到routers中
  *
  * @param  {Object} config - 对应的配置项目,字段如下:
@@ -65,14 +141,27 @@ function initRouter(actions) {
 function bindActionRouter(config) {
     if (!(config && config.actionDir)) throw new Error('missing actionDir config in lego framework');
 
-    const actions = legoUtils.common.getFilteredFiles(config.actionDir, {
+    storeActionPaths = legoUtils.common.getFilteredFiles(config.actionDir, {
         nameRegex: config.nameRegex
     });
+    initRouter();
+    /*
+        新增功能，如果是开发环境
+        那么watch action和它的引用文件，变更自动reload
+     */
+    if (isDev) {
+        storeActionPaths.forEach((action) => {
+            collectFileAndChildren(action);
+        });
+        watchFilesChange();
+    }
+}
 
-    initRouter(actions);
+function getRouter() {
+    return routerIns;
 }
 
 module.exports = {
-    router: routerIns,
+    getRouter,
     bindActionRouter
 };

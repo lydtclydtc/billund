@@ -62,7 +62,7 @@ function init(config) {
         }
     }
     return function* combineLego(next) {
-        yield doRender.call(this, actionBinder.router.call(this, next));
+        yield doRender.call(this, actionBinder.getRouter().call(this, next));
     };
 }
 
