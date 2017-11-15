@@ -13,7 +13,7 @@ const store = require('../store/index');
 const router = require('../router/index');
 const renderUtil = require('../render/index');
 
-const isDev = (process.env.LEGO_ENV === 'development' || process.env.BILLUND_ENV === 'development');
+const isDev = (process.env.LEGO_ENV === 'development' || process.env.LEGO_ENV === 'dev' || process.env.BILLUND_ENV === 'development' || process.env.BILLUND_ENV === 'dev');
 
 /*
     渲染插件

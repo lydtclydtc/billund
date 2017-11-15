@@ -1,6 +1,6 @@
 'use strict';
 
-const isDev = (process.env.LEGO_ENV === 'development' || process.env.BILLUND_ENV === 'development');
+const isDev = (process.env.LEGO_ENV === 'development' || process.env.LEGO_ENV === 'dev' || process.env.BILLUND_ENV === 'development' || process.env.BILLUND_ENV === 'dev');
 
 const _ = require('lodash');
 const Vue = require('vue/dist/vue.common.js');
