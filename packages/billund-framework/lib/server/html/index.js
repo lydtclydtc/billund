@@ -102,6 +102,7 @@ function* execute(context) {
 
     const pluginConfig = {
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
+        vendors: Object.assign({}, baseopt.vendors),
         storeData: originalStoreData,
         widgets,
         mostImportantWidgets,
