@@ -39,6 +39,13 @@ function connectVueTemplateElement(widgetBridge) {
         widgetBridge.rootContainer.appendChild(node);
     }
 
+    /*
+        先进行注册子组件的store
+     */
+    if (widgetBridge.storeConfig && widgetBridge.supportor) {
+        widgetBridge.supportor.registOwnModule(widgetBridge.widgetId, widgetBridge.storeConfig);
+    }
+
     const needRouter = !!widgetBridge.routers;
     if (needRouter) {
         new Vue({
@@ -50,14 +57,6 @@ function connectVueTemplateElement(widgetBridge) {
                 };
             },
             store: widgetBridge.store,
-            mounted() {
-                const storeConfig = widgetBridge.storeConfig;
-                if (!storeConfig) return;
-                const supportor = widgetBridge.supportor;
-                if (!(supportor && supportor.registOwnModule)) return;
-
-                supportor.registOwnModule(this.legoWidgetId, storeConfig);
-            },
             render(h) {
                 return h('router-view', {
                     props: {
@@ -75,15 +74,7 @@ function connectVueTemplateElement(widgetBridge) {
                 legoWidgetId: widgetBridge.widgetId
             };
         },
-        store: widgetBridge.store,
-        mounted() {
-            const storeConfig = widgetBridge.storeConfig;
-            if (!storeConfig) return;
-            const supportor = widgetBridge.supportor;
-            if (!(supportor && supportor.registOwnModule)) return;
-
-            supportor.registOwnModule(this.legoWidgetId, storeConfig);
-        }
+        store: widgetBridge.store
     }));
 }
 
