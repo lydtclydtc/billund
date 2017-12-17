@@ -89,8 +89,8 @@ function processRenderPlugins(headerPlugins, bodyPlugins) {
      */
     if (baseopt.sortRenderPlugin) {
         const ret = baseopt.sortRenderPlugin(headerPlugins, bodyPlugins);
-        headerPlugins = ret.header || headerPlugins;
-        bodyPlugins = ret.body || bodyPlugins;
+        headerPlugins = ret && ret.header || headerPlugins;
+        bodyPlugins = ret && ret.body || bodyPlugins;
     }
     headerPlugins = headerPlugins.map((plugin) => {
         if (_.isPlainObject(plugin) && plugin.renderPlugin) {
