@@ -15,7 +15,8 @@ const worker = require('./html/index.js');
  *      widgetNameRegex: [Regex|String] // 名称的正则
  *      supportorPath: [String], // 支持组件路径
  *      vendors: [Object], // dll文件的路径(取决于你自己的解析方式),一般会有react|vue两个字段
- *      renderPlugins: [Object] // 渲染插件,一般会有header和body两个字段,对应不同的位置
+ *      renderPlugins: [Object], // 渲染插件,一般会有header和body两个字段,对应不同的位置
+ *      sortRenderPlugin: [Function] // renderPlugin的操作、处理函数
  * }
  * @return {GenerateFunction}
  */

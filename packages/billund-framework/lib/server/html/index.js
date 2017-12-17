@@ -68,6 +68,48 @@ function init(config) {
         header: headerPlugins,
         body: bodyPlugins
     };
+    if (baseopt.sortRenderPlugin) {
+        console.warn('We noticed that you are using the sortRenderPlugin method which is an advanced feature, so be sure to ensure that the processed pages are still served properly.');
+    }
+}
+
+/**
+ * renderPlugin的处理函数
+ *
+ * @param  {Array} headerPlugins - 头部的plugin信息
+ * @param  {Array} bodyPlugins - 中间的plugin信息
+ * @return {Object} 有 header、body两个字段
+ */
+function processRenderPlugins(headerPlugins, bodyPlugins) {
+    headerPlugins = headerPlugins || [];
+    bodyPlugins = bodyPlugins || [];
+    /*
+        1.如果有需要处理的调用函数，就进行处理
+        2.进行抓取
+     */
+    if (baseopt.sortRenderPlugin) {
+        const ret = baseopt.sortRenderPlugin(headerPlugins, bodyPlugins);
+        headerPlugins = ret && ret.header || headerPlugins;
+        bodyPlugins = ret && ret.body || bodyPlugins;
+    }
+    headerPlugins = headerPlugins.map((plugin) => {
+        if (_.isPlainObject(plugin) && plugin.renderPlugin) {
+            return plugin.renderPlugin;
+        }
+        return plugin;
+    });
+
+    bodyPlugins = bodyPlugins.map((plugin) => {
+        if (_.isPlainObject(plugin) && plugin.renderPlugin) {
+            return plugin.renderPlugin;
+        }
+        return plugin;
+    });
+
+    return {
+        header: headerPlugins,
+        body: bodyPlugins
+    };
 }
 
 /**
@@ -135,8 +177,10 @@ function* execute(context) {
         }
      */
     const plugins = baseopt.renderPlugins;
-    const headerPlugins = plugins.header || [];
-    const bodyPlugins = plugins.body || [];
+
+    const sortedPlugins = processRenderPlugins(plugins.header || [], plugins.body || []);
+    const headerPlugins = sortedPlugins.header || [];
+    const bodyPlugins = sortedPlugins.body || [];
 
     const headerTasks = headerPlugins.map((fn) => {
         return function*() {
