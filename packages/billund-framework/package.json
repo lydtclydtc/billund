@@ -27,6 +27,8 @@
     "gaze": "^1.0.0"
   },
   "peerDependencies": {
+    "billund-action-loader": "^1.2.0-alpha.0",
+    "billund-config-loader": "^1.2.0-alpha.0",
     "react": "^0.14.0 || ^15.0.0-0",
     "react-addons-css-transition-group": "^0.14.0 || ^15.0.0-0",
     "react-dom": "^0.14.0 || ^15.0.0-0",

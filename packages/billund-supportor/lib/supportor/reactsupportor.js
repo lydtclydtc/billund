@@ -149,6 +149,9 @@ class ReactSupportor extends BaseSupportor {
      * @param {Object} routerConfig - 配置
      */
     [SupportorEnums.BROWSER_SUPPORTOR_REGISTER_ROUTER_CONFIG](routerConfig) {
+        if (this.routerRegistered) return;
+
+        this.routerRegistered = true;
         const id2WidgetBridge = {};
         (this.widgetConfigs || []).forEach((config) => {
             const id = config.id;

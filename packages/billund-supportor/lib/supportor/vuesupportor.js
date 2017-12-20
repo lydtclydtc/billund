@@ -190,6 +190,10 @@ class VueSupportor extends BaseSupportor {
      * @param {Object} routerConfig - 配置
      */
     [SupportorEnums.BROWSER_SUPPORTOR_REGISTER_ROUTER_CONFIG](routerConfig) {
+        if (this.routerRegistered) return;
+
+        this.routerRegistered = true;
+
         const id2WidgetBridge = {};
         (this.widgetConfigs || []).forEach((config) => {
             const id = config.id;
@@ -257,6 +261,7 @@ class VueSupportor extends BaseSupportor {
                 });
             });
             const routers = new VueRouter(routerConfig);
+            this.router = routers;
             Object.keys(id2WidgetBridge).forEach((id) => {
                 id2WidgetBridge[id].initRouters(routers);
             });

@@ -73,6 +73,9 @@ class BaseFESupportor {
         this.id2PathsMapping = {};
         // 一些与上下文强相关的事件是否已经处理
         this.sthDependentOnContextProcessed = false;
+        // 是否被注册过router
+        this.routerRegistered = false;
+        this.router = null;
 
         const self = this;
         /**
@@ -549,6 +552,10 @@ class BaseFESupportor {
      */
     getState() {
         throw new Error(`you should impletement getState function.`);
+    }
+
+    getRouter() {
+        return this.router;
     }
 
     /**

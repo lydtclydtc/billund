@@ -1125,6 +1125,9 @@ var BaseFESupportor = function () {
         this.id2PathsMapping = {};
         // 一些与上下文强相关的事件是否已经处理
         this.sthDependentOnContextProcessed = false;
+        // 是否被注册过router
+        this.routerRegistered = false;
+        this.router = null;
 
         var self = this;
         /**
@@ -1712,6 +1715,11 @@ var BaseFESupportor = function () {
         key: 'getState',
         value: function getState() {
             throw new Error('you should impletement getState function.');
+        }
+    }, {
+        key: 'getRouter',
+        value: function getRouter() {
+            return this.router;
         }
 
         /**
@@ -3638,6 +3646,9 @@ var ReactSupportor = function (_BaseSupportor) {
         value: function value(routerConfig) {
             var _this3 = this;
 
+            if (this.routerRegistered) return;
+
+            this.routerRegistered = true;
             var id2WidgetBridge = {};
             (this.widgetConfigs || []).forEach(function (config) {
                 var id = config.id;
@@ -4018,6 +4029,10 @@ var VueSupportor = function (_BaseSupportor) {
         value: function value(routerConfig) {
             var _this3 = this;
 
+            if (this.routerRegistered) return;
+
+            this.routerRegistered = true;
+
             var id2WidgetBridge = {};
             (this.widgetConfigs || []).forEach(function (config) {
                 var id = config.id;
@@ -4085,6 +4100,7 @@ var VueSupportor = function (_BaseSupportor) {
                     });
                 });
                 var routers = new _vueRouter2.default(routerConfig);
+                _this3.router = routers;
                 Object.keys(id2WidgetBridge).forEach(function (id) {
                     id2WidgetBridge[id].initRouters(routers);
                 });
