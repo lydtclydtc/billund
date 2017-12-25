@@ -13,7 +13,9 @@ module.exports = function*(config) {
     config = config || {};
     const storeData = config.storeData && _.isObject(config.storeData) ? config.storeData : {};
 
+    const unsafeStr = JSON.stringify(storeData);
+    const safeStr = encodeURIComponent(unsafeStr);
     return {
-        result: `<script class="lego-initial-state">window.${STATE.INITIAL_STATE}=${JSON.stringify(storeData)}</script>`
+        result: `<script class="lego-initial-state">window.${STATE.INITIAL_STATE}=JSON.parse(decodeURIComponent("${safeStr}"))</script>`
     };
 };
