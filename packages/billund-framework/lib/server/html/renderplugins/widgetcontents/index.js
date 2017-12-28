@@ -150,7 +150,7 @@ module.exports = function*(config) {
         }).join('');
     }
 
-    const shouldHidden = (!config.allowShowEvenFailed) && (mostImportantWidgets.length > successWidgets.length);
+    const shouldHidden = (!config.allowShowEvenFailed) && (!config.noServerRender) && (mostImportantWidgets.length > successWidgets.length);
     return {
         result: createMainPage(content, shouldHidden)
     };

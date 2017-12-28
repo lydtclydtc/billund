@@ -143,6 +143,7 @@ function* execute(context) {
     const failWidgets = _.extend(combineResults.important.failWidgets, combineResults.other);
 
     const pluginConfig = {
+        noServerRender: !!legoConfig.noServerRender,
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
         vendors: Object.assign({}, baseopt.vendors),
         storeData: originalStoreData,
@@ -272,7 +273,9 @@ function exportStaticResources(config, widgets) {
  * @return {Object} - 分别对应成功和失败的结果
  */
 function* renderMostImportantWidgets(context, widgets) {
-    const tasks = buildWidgetTasks(context, widgets, false);
+    const legoConfig = context.legoConfig;
+    const mustFail = !!legoConfig.noServerRender;
+    const tasks = buildWidgetTasks(context, widgets, mustFail);
     const ret = yield tasks;
 
     const successWidgets = {};
