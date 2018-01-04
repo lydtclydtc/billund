@@ -5,13 +5,13 @@ const Vue = require('vue');
 const Vuex = require('vuex');
 import VueRouter from 'vue-router';
 const compareVersions = require('compare-versions');
+const deepExtend = require('deep-extend');
 const BaseSupportor = require('./basesupportor.js');
 const Enums = require('billund-enums');
 const renderEnums = Enums.render;
 const WidgetEnums = Enums.widget;
 const StateEnums = Enums.state;
 const SupportorEnums = Enums.supportor;
-const actionUtils = require('billund-utils/lib/action.js');
 const Util = require('../util/index.js');
 
 /**
@@ -26,6 +26,54 @@ const KEY_REFRESH_COUNT = 'refreshCount';
 const API_ALIAS_CONFIG = {
     registerOwnModule: 'registOwnModule'
 };
+
+function findRouteByPath(routes, path) {
+    return routes.find((route) => {
+        return path === route.path;
+    });
+}
+
+/**
+ * 返回新的vue-router-config
+ *
+ * @param  {Object} to - 用以覆盖的对象
+ * @param  {Object} source - 来源对象
+ * @return {Object}
+ */
+function mixVueRouterConfig(to, source) {
+    // 如果两个都不存在的话 返回null
+    if (!(to || source)) return null;
+
+    to = Object.assign({}, to);
+    const routes = [];
+    /*
+        先对to的routes进行遍历，mixin加入
+        再对source的routes进行遍历补漏
+     */
+    (to.routes || []).forEech((route) => {
+        const path = route.path;
+        const relatedRoute = findRouteByPath(source.routes || [], path);
+        routes.push(deepExtend(Object.assign({}, route), relatedRoute));
+    });
+
+    (source.routes || []).forEech((route) => {
+        const path = route.path;
+        const inIndex = routes.findIndex((r) => {
+            return r.path === path;
+        });
+        if (inIndex !== -1) return;
+
+        const relatedRoute = findRouteByPath(to.routes || [], path);
+        routes.push(deepExtend(Object.assign({}, relatedRoute), route));
+    });
+
+    deepExtend(to, source);
+    deepExtend(to, {
+        routes
+    });
+
+    return to;
+}
 
 /**
  * vue的前端支持组件
@@ -211,7 +259,7 @@ class VueSupportor extends BaseSupportor {
             return;
         }
 
-        routerConfig = actionUtils.mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
+        routerConfig = mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
 
         const routes = routerConfig.routes;
         const rootPathIndex = routes.findIndex((route) => {

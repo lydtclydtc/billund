@@ -5,12 +5,12 @@ const isDev = (process.env.LEGO_ENV === 'development' || process.env.LEGO_ENV ==
 const debug = require('debug');
 const log = debug('billund-vue-router:error');
 const compareVersions = require('compare-versions');
+const deepExtend = require('deep-extend');
 const Vue = require('vue/dist/vue.common.js');
 const VueRouter = require('vue-router');
 Vue.use(VueRouter);
 
 const VueRender = require('../../render/lib/vue.js');
-const actionUtil = require('billund-utils/lib/action.js');
 
 function normalizeBase(base) {
     // make sure there's the starting slash
@@ -19,6 +19,54 @@ function normalizeBase(base) {
     }
     // remove trailing slash
     return base.replace(/\/$/, '');
+}
+
+function findRouteByPath(routes, path) {
+    return routes.find((route) => {
+        return path === route.path;
+    });
+}
+
+/**
+ * 返回新的vue-router-config
+ *
+ * @param  {Object} to - 用以覆盖的对象
+ * @param  {Object} source - 来源对象
+ * @return {Object}
+ */
+function mixVueRouterConfig(to, source) {
+    // 如果两个都不存在的话 返回null
+    if (!(to || source)) return null;
+
+    to = Object.assign({}, to);
+    const routes = [];
+    /*
+        先对to的routes进行遍历，mixin加入
+        再对source的routes进行遍历补漏
+     */
+    (to.routes || []).forEech((route) => {
+        const path = route.path;
+        const relatedRoute = findRouteByPath(source.routes || [], path);
+        routes.push(deepExtend(Object.assign({}, route), relatedRoute));
+    });
+
+    (source.routes || []).forEech((route) => {
+        const path = route.path;
+        const inIndex = routes.findIndex((r) => {
+            return r.path === path;
+        });
+        if (inIndex !== -1) return;
+
+        const relatedRoute = findRouteByPath(to.routes || [], path);
+        routes.push(deepExtend(Object.assign({}, relatedRoute), route));
+    });
+
+    deepExtend(to, source);
+    deepExtend(to, {
+        routes
+    });
+
+    return to;
 }
 
 /**
@@ -32,7 +80,7 @@ function normalizeBase(base) {
 function createRouter(context, config, widgets) {
     if (!(config.routerConfig || config.staticRouterConfig)) return null;
 
-    const routerConfig = actionUtil.mixVueRouterConfig(config.staticRouterConfig, config.routerConfig);
+    const routerConfig = mixVueRouterConfig(config.staticRouterConfig, config.routerConfig);
     if (!(routerConfig.routes && routerConfig.routes.length)) return null;
 
     const routes = routerConfig.routes;

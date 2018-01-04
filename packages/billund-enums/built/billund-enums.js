@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -126,12 +126,15 @@ var ID_SERVER_TIME = '__LEGO_SERVER_TIME_';
 var KEY_PAGE_VERSION = '__LEGO_PAGE_VERSION_';
 // 测速点
 var FIRST_SHOW_POINT = '__LEGO_FIRST_SHOW_POINT';
+// routerConfig
+var KEY_ROUTER_CONFIG = '__LEGO_ROUTER_CONFIG_';
 
 module.exports = {
     ID_MAIN_PAGE: ID_MAIN_PAGE,
     ID_SERVER_TIME: ID_SERVER_TIME,
     KEY_PAGE_VERSION: KEY_PAGE_VERSION,
-    FIRST_SHOW_POINT: FIRST_SHOW_POINT
+    FIRST_SHOW_POINT: FIRST_SHOW_POINT,
+    KEY_ROUTER_CONFIG: KEY_ROUTER_CONFIG
 };
 
 /***/ }),
