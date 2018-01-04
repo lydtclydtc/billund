@@ -57,7 +57,7 @@ module.exports = {
     module: {
         rules: [{
             test: /\.(js)$/,
-            exclude: /node_modules\/(?!(billund-utils))/,
+            exclude: /node_modules\/(?!(billund-enums))/,
             use: [{
                 loader: 'babel-loader',
                 options: {
