@@ -161,17 +161,14 @@ function extractStoreConfig(source, state) {
  * 抓取router的配置
  *
  * @param  {String} source - 源代码
- * @param  {Object} state - 状态对象,有如下几个字段:
- * {
- *
- * }
  * @return {String}
  */
-function extractRouterConfig(source, state) {
+function extractRouterConfig(source) {
     if (!source) return '';
 
     const ast = babylon.parse(source);
-    let routerConfigStr = '';
+    const propertiesInExports = [];
+    const propertiesOutOfExports = [];
 
     traverse(ast, {
         ObjectExpression(path) {
@@ -180,13 +177,51 @@ function extractRouterConfig(source, state) {
                 return property.key.name === 'routerConfig' || property.key.value === 'routerConfig';
             });
             if (!configProperty) return;
+            /*
+                判断是否来自于module.exports | export default，推入propertiesInExports
+                其他的推入propertiesOutOfExports
+             */
+            const exportsParent = path.findParent((pa) => {
+                const isAssignmentExpression = pa.isAssignmentExpression();
+                if (!isAssignmentExpression) return false;
 
-            const value = configProperty.value;
-            routerConfigStr = source.substring(value.start, value.end);
+                const leftNode = pa.node.left;
+                if (!leftNode) return false;
+                return leftNode.object.name == 'module' && leftNode.property.name == 'exports';
+            });
+            if (exportsParent) {
+                propertiesInExports.push(configProperty);
+                return;
+            }
+
+            const exportDefaultParent = path.findParent((pa) => {
+                return pa.isExportDefaultDeclaration();
+            });
+            if (exportDefaultParent) {
+                propertiesInExports.push(configProperty);
+                return;
+            }
+
+            propertiesOutOfExports.push(configProperty);
         }
     });
+    /*
+        优先匹配propertiesInExports中的，这里面一定是一个路径字符串
+     */
+    if (propertiesInExports && propertiesInExports.length) {
+        const value = propertiesInExports[0].value;
+        return `require(${source.substring(value.start, value.end)});`;
+    }
 
-    return routerConfigStr;
+    /*
+        其次匹配propertiesOutOfExports,这里面是完整的代码
+     */
+    if (propertiesOutOfExports && propertiesOutOfExports.length) {
+        const value = propertiesOutOfExports[0].value;
+        return source.substring(value.start, value.end);
+    }
+
+    return '';
 }
 
 /**

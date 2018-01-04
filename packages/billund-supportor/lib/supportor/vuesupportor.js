@@ -7,9 +7,11 @@ import VueRouter from 'vue-router';
 const compareVersions = require('compare-versions');
 const BaseSupportor = require('./basesupportor.js');
 const Enums = require('billund-enums');
+const renderEnums = Enums.render;
 const WidgetEnums = Enums.widget;
 const StateEnums = Enums.state;
 const SupportorEnums = Enums.supportor;
+const actionUtils = require('billund-utils/lib/action.js');
 const Util = require('../util/index.js');
 
 /**
@@ -193,7 +195,6 @@ class VueSupportor extends BaseSupportor {
         if (this.routerRegistered) return;
 
         this.routerRegistered = true;
-
         const id2WidgetBridge = {};
         (this.widgetConfigs || []).forEach((config) => {
             const id = config.id;
@@ -203,12 +204,14 @@ class VueSupportor extends BaseSupportor {
             id2WidgetBridge[id] = widgetBridge;
         });
 
-        if (!(routerConfig && routerConfig.routes && routerConfig.routes.length)) {
+        if (!(routerConfig || window[renderEnums.KEY_ROUTER_CONFIG])) {
             Object.keys(id2WidgetBridge).forEach((id) => {
                 id2WidgetBridge[id].initRouters();
             });
             return;
         }
+
+        routerConfig = actionUtils.mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
 
         const routes = routerConfig.routes;
         const rootPathIndex = routes.findIndex((route) => {

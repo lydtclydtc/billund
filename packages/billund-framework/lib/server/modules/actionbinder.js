@@ -43,6 +43,10 @@ function initRouter() {
         if (url2Path[url]) throw new Error(`duplicate define router url: ${url}`);
 
         url2Path[url] = true;
+        let staticRc = null;
+        if (actionConfig.routerConfig) {
+            staticRc = require(path.resolve(actionPath, actionConfig.routerConfig));
+        }
 
         function* injector(next) {
             yield next;
@@ -50,17 +54,8 @@ function initRouter() {
                  如果有routerConfig的话
                  是一个字符串，那么是相对的路径，目前只有这种情况才能解决代码解析的问题
              */
-            if (actionConfig.routerConfig && this.legoConfig && this.legoConfig.routerConfig) {
-                if (_.isString(actionConfig.routerConfig)) {
-                    const staticRc = require(path.resolve(actionPath, actionConfig.routerConfig));
-                    this.legoConfig.routerConfig = Object.assign({}, staticRc, this.legoConfig.routerConfig);
-                    /*
-                        如果是dev的话，加入watchFile
-                     */
-                    if (isDev) {
-                        collectFileAndChildren(staticRc);
-                    }
-                }
+            if (staticRc && this.legoConfig) {
+                this.legoConfig.staticRouterConfig = require(staticRc);
             }
         }
         router.register(url, ['get', 'post'], [injector, actionConfig.action]);
@@ -69,6 +64,7 @@ function initRouter() {
         */
         if (isDev) {
             collectFileAndChildren(actionPath);
+            collectFileAndChildren(staticRc);
         }
     }
 

@@ -134,7 +134,7 @@ function* execute(context) {
     const staticResources = exportStaticResources(legoConfig, widgets);
 
     store.assemblyStore(legoConfig, mostImportantWidgets);
-    router.assemblyRouters(context, legoConfig, mostImportantWidgets);
+    const routerConfig = router.assemblyRouters(context, legoConfig, mostImportantWidgets);
 
     const combineResults = yield {
         important: renderMostImportantWidgets(context, mostImportantWidgets),
@@ -149,7 +149,7 @@ function* execute(context) {
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
         vendors: Object.assign({}, baseopt.vendors),
         storeData: originalStoreData,
-        routerConfig: legoConfig.routerConfig,
+        routerConfig,
         widgets,
         mostImportantWidgets,
         executeResults: {

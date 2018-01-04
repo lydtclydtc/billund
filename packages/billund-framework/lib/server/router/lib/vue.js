@@ -10,6 +10,7 @@ const VueRouter = require('vue-router');
 Vue.use(VueRouter);
 
 const VueRender = require('../../render/lib/vue.js');
+const actionUtil = require('billund-utils/lib/action.js');
 
 function normalizeBase(base) {
     // make sure there's the starting slash
@@ -29,9 +30,9 @@ function normalizeBase(base) {
  * @return {Object} router实例
  */
 function createRouter(context, config, widgets) {
-    if (!config.routerConfig) return null;
+    if (!(config.routerConfig || config.staticRouterConfig)) return null;
 
-    const routerConfig = config.routerConfig;
+    const routerConfig = actionUtil.mixVueRouterConfig(config.staticRouterConfig, config.routerConfig);
     if (!(routerConfig.routes && routerConfig.routes.length)) return null;
 
     const routes = routerConfig.routes;
@@ -79,7 +80,11 @@ function createRouter(context, config, widgets) {
         pushUrl = pushUrl || '/';
     }
     router.pushUrl = pushUrl;
-    return router;
+
+    return {
+        router,
+        routerConfig
+    };
 }
 
 module.exports = {
