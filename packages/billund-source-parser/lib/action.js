@@ -210,7 +210,7 @@ function extractRouterConfig(source) {
      */
     if (propertiesInExports && propertiesInExports.length) {
         const value = propertiesInExports[0].value;
-        return `require(${source.substring(value.start, value.end)});`;
+        return `require(${source.substring(value.start, value.end)})`;
     }
 
     /*

@@ -38,40 +38,7 @@ function* action() {
             }]
         },
         routerConfig: {
-            base: '/dynamic-segment/',
-            mode: 'history',
-            routes: [{
-                    path: '/'
-                },
-                {
-                    path: '/hello/:name',
-                    props: true,
-                    beforeEnter(to, from, next) {
-                        next();
-                    }
-                },
-                {
-                    path: '/static',
-                    props: {
-                        name: 'world'
-                    }
-                },
-                {
-                    path: '/dynamic/:years',
-                    props: function dynamicPropsFn(route) {
-                        const now = new Date();
-                        return {
-                            name: (now.getFullYear() + parseInt(route.params.years)) + '!'
-                        };
-                    }
-                },
-                {
-                    path: '/attrs',
-                    props: {
-                        name: 'attrs'
-                    }
-                }
-            ]
+            mode: 'history'
         }
     };
 }
@@ -80,5 +47,6 @@ module.exports = {
     url: ['/', '/hello/:name', '/static', '/dynamic/:years', '/attrs'].map((value) => {
         return BASE + value;
     }),
+    routerConfig: '../mods/dynamic-segment/router.js',
     action
 };

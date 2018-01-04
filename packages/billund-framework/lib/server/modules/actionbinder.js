@@ -45,7 +45,8 @@ function initRouter() {
         url2Path[url] = true;
         let staticRc = null;
         if (actionConfig.routerConfig) {
-            staticRc = require(path.resolve(actionPath, actionConfig.routerConfig));
+            const actionPathDir = path.resolve(actionPath, '../');
+            staticRc = path.resolve(actionPathDir, actionConfig.routerConfig);
         }
 
         function* injector(next) {

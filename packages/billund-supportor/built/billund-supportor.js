@@ -3646,13 +3646,13 @@ function mixVueRouterConfig(to, source) {
         先对to的routes进行遍历，mixin加入
         再对source的routes进行遍历补漏
      */
-    (to.routes || []).forEech(function (route) {
+    (to.routes || []).forEach(function (route) {
         var path = route.path;
         var relatedRoute = findRouteByPath(source.routes || [], path);
         routes.push(deepExtend(_extends({}, route), relatedRoute));
     });
 
-    (source.routes || []).forEech(function (route) {
+    (source.routes || []).forEach(function (route) {
         var path = route.path;
         var inIndex = routes.findIndex(function (r) {
             return r.path === path;
@@ -3879,6 +3879,10 @@ var VueSupportor = function (_BaseSupportor) {
                 return;
             }
 
+            var prevRouterConfig = window[renderEnums.KEY_ROUTER_CONFIG];
+            (prevRouterConfig.routes || []).forEach(function (route) {
+                delete route.props;
+            });
             routerConfig = mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
 
             var routes = routerConfig.routes;

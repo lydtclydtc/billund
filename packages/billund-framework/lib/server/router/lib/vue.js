@@ -44,13 +44,13 @@ function mixVueRouterConfig(to, source) {
         先对to的routes进行遍历，mixin加入
         再对source的routes进行遍历补漏
      */
-    (to.routes || []).forEech((route) => {
+    (to.routes || []).forEach((route) => {
         const path = route.path;
         const relatedRoute = findRouteByPath(source.routes || [], path);
         routes.push(deepExtend(Object.assign({}, route), relatedRoute));
     });
 
-    (source.routes || []).forEech((route) => {
+    (source.routes || []).forEach((route) => {
         const path = route.path;
         const inIndex = routes.findIndex((r) => {
             return r.path === path;
