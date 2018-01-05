@@ -78,7 +78,7 @@ function mixVueRouterConfig(to, source) {
  * @return {Object} router实例
  */
 function createRouter(context, config, widgets) {
-    if (!(config.routerConfig || config.staticRouterConfig || config.routerConfigAbsolutePath)) return null;
+    if (!(config.routerConfig || config.staticRouterConfig)) return null;
 
     const routerConfig = mixVueRouterConfig(config.staticRouterConfig, config.routerConfig);
     if (!(routerConfig.routes && routerConfig.routes.length)) return null;

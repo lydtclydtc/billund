@@ -9,8 +9,8 @@ const worker = require('./html/index.js');
  *
  * @param  {Object} config - 初始化配置,字段如下:
  * {
- * 		actionDir: [String], // action的文件夹名称
- * 		actionNameRegex: [Regex|String], // action名称的正则
+ *      actionDir: [String], // action的文件夹名称
+ *      actionNameRegex: [Regex|String], // action名称的正则
  *      widgetDir: [String], // widget的文件夹名称
  *      widgetNameRegex: [Regex|String] // 名称的正则
  *      supportorPath: [String], // 支持组件路径
@@ -21,10 +21,10 @@ const worker = require('./html/index.js');
  * @return {GenerateFunction}
  */
 function init(config) {
-    actionBinder.bindActionRouter({
+    actionBinder.bindActionRouter(Object.assign({}, config, {
         actionDir: config.actionDir,
         nameRegex: config.actionNameRegex
-    });
+    }));
     widgetsPool.bindWidgets({
         widgetDir: config.widgetDir,
         nameRegex: config.widgetNameRegex
@@ -55,10 +55,10 @@ function init(config) {
             yield worker.execute(this);
         } catch (e) {
             /*
-            	lego并不真正的处理错误,而是继续向外抛,直到有人处理
+                lego并不真正的处理错误,而是继续向外抛,直到有人处理
              */
             console.error(`lego didn't deal this error,please confirm it's dealed by outside.
-            				${e.stack}`);
+                            ${e.stack}`);
             throw e;
         }
     }

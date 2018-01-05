@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const BASE = '/dynamic-segment';
 
 function* action() {
@@ -40,7 +41,7 @@ function* action() {
         routerConfig: {
             mode: 'history'
         },
-        routerConfigRelativePath: '../mods/dynamic-segment/router.js'
+        routerConfigPath: path.resolve(__dirname, '../mods/dynamic-segment/router.js')
     };
 }
 

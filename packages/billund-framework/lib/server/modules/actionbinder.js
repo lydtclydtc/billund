@@ -62,9 +62,14 @@ function initRouter() {
                  是一个字符串，那么是相对的路径，目前只有这种情况才能解决代码解析的问题
              */
             if (this.legoConfig) {
-                // 优先判断routerConfigRelativePath
-                if (this.legoConfig.routerConfigRelativePath) {
-                    const rcPath = path.resolve(actionPathDir, this.legoConfig.routerConfigRelativePath);
+                // 优先判断routerConfigPath
+                if (this.legoConfig.routerConfigPath) {
+                    let rcPath = '';
+                    if (path.isAbsolute(this.legoConfig.routerConfigPath)) {
+                        rcPath = this.legoConfig.routerConfigPath;
+                    } else {
+                        rcPath = path.resolve(actionPathDir, this.legoConfig.routerConfigPath);
+                    }
                     this.legoConfig.staticRouterConfig = require(rcPath);
                     if (isDev) {
                         collectFileAndChildren(rcPath);

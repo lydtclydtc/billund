@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const babylon = require('babylon');
 const traverse = require('babel-traverse').default;
 const babelTypes = require('babel-types');
@@ -163,7 +164,7 @@ function extractStoreConfig(source, state) {
  * @param  {String} source - 源代码
  * @return {String}
  */
-function extractRouterConfig(source) {
+function extractRouterConfig(source, state) {
     if (!source) return '';
 
     const ast = babylon.parse(source);
@@ -176,10 +177,10 @@ function extractRouterConfig(source) {
     const codeProperties = [];
 
     traverse(ast, {
-        ObjectExpression(path) {
-            const properties = path.node.properties || [];
+        ObjectExpression(nodePath) {
+            const properties = nodePath.node.properties || [];
             const relativePathProperty = properties.find((property) => {
-                return property.key.name === 'routerConfigRelativePath' || property.key.value === 'routerConfigRelativePath';
+                return property.key.name === 'routerConfigPath' || property.key.value === 'routerConfigPath';
             });
             if (relativePathProperty) {
                 pathProperties.push(relativePathProperty);
@@ -192,7 +193,7 @@ function extractRouterConfig(source) {
                 判断是否来自于module.exports | export default，推入pathProperties
                 其他的推入propertiesOutOfExports
              */
-            const exportsParent = path.findParent((pa) => {
+            const exportsParent = nodePath.findParent((pa) => {
                 const isAssignmentExpression = pa.isAssignmentExpression();
                 if (!isAssignmentExpression) return false;
 
@@ -205,7 +206,7 @@ function extractRouterConfig(source) {
                 return;
             }
 
-            const exportDefaultParent = path.findParent((pa) => {
+            const exportDefaultParent = nodePath.findParent((pa) => {
                 return pa.isExportDefaultDeclaration();
             });
             if (exportDefaultParent) {
@@ -221,7 +222,14 @@ function extractRouterConfig(source) {
      */
     if (pathProperties && pathProperties.length) {
         const value = pathProperties[0].value;
-        return `require(${source.substring(value.start, value.end)})`;
+        let realPath = '';
+        if (babelTypes.isCallExpression(value)) {
+            realPath = source.substring(value.start, value.end).replace('__dirname', `'${state.dirname}'`);
+            realPath = `"${eval(realPath)}"`;
+        } else {
+            realPath = source.substring(value.start, value.end);
+        }
+        return `require(${realPath})`;
     }
 
     /*
