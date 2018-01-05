@@ -39,7 +39,8 @@ function* action() {
         },
         routerConfig: {
             mode: 'history'
-        }
+        },
+        routerConfigRelativePath: '../mods/dynamic-segment/router.js'
     };
 }
 
@@ -47,6 +48,5 @@ module.exports = {
     url: ['/', '/hello/:name', '/static', '/dynamic/:years', '/attrs'].map((value) => {
         return BASE + value;
     }),
-    routerConfig: '../mods/dynamic-segment/router.js',
     action
 };

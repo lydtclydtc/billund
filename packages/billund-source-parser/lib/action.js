@@ -167,18 +167,29 @@ function extractRouterConfig(source) {
     if (!source) return '';
 
     const ast = babylon.parse(source);
-    const propertiesInExports = [];
-    const propertiesOutOfExports = [];
+    /*
+        总共有两种properties:
+        1: path
+        2: code
+     */
+    const pathProperties = [];
+    const codeProperties = [];
 
     traverse(ast, {
         ObjectExpression(path) {
             const properties = path.node.properties || [];
+            const relativePathProperty = properties.find((property) => {
+                return property.key.name === 'routerConfigRelativePath' || property.key.value === 'routerConfigRelativePath';
+            });
+            if (relativePathProperty) {
+                pathProperties.push(relativePathProperty);
+            }
             const configProperty = properties.find((property) => {
                 return property.key.name === 'routerConfig' || property.key.value === 'routerConfig';
             });
             if (!configProperty) return;
             /*
-                判断是否来自于module.exports | export default，推入propertiesInExports
+                判断是否来自于module.exports | export default，推入pathProperties
                 其他的推入propertiesOutOfExports
              */
             const exportsParent = path.findParent((pa) => {
@@ -190,7 +201,7 @@ function extractRouterConfig(source) {
                 return leftNode.object.name == 'module' && leftNode.property.name == 'exports';
             });
             if (exportsParent) {
-                propertiesInExports.push(configProperty);
+                pathProperties.push(configProperty);
                 return;
             }
 
@@ -198,26 +209,26 @@ function extractRouterConfig(source) {
                 return pa.isExportDefaultDeclaration();
             });
             if (exportDefaultParent) {
-                propertiesInExports.push(configProperty);
+                pathProperties.push(configProperty);
                 return;
             }
 
-            propertiesOutOfExports.push(configProperty);
+            codeProperties.push(configProperty);
         }
     });
     /*
-        优先匹配propertiesInExports中的，这里面一定是一个路径字符串
+        优先匹配pathProperties中的，这里面一定是一个路径字符串
      */
-    if (propertiesInExports && propertiesInExports.length) {
-        const value = propertiesInExports[0].value;
+    if (pathProperties && pathProperties.length) {
+        const value = pathProperties[0].value;
         return `require(${source.substring(value.start, value.end)})`;
     }
 
     /*
-        其次匹配propertiesOutOfExports,这里面是完整的代码
+        其次匹配codeProperties,这里面是完整的代码
      */
-    if (propertiesOutOfExports && propertiesOutOfExports.length) {
-        const value = propertiesOutOfExports[0].value;
+    if (codeProperties && codeProperties.length) {
+        const value = codeProperties[0].value;
         return source.substring(value.start, value.end);
     }
 

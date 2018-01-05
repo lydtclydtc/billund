@@ -44,8 +44,8 @@ function initRouter() {
 
         url2Path[url] = true;
         let staticRc = null;
+        const actionPathDir = path.resolve(actionPath, '../');
         if (actionConfig.routerConfig) {
-            const actionPathDir = path.resolve(actionPath, '../');
             staticRc = path.resolve(actionPathDir, actionConfig.routerConfig);
         }
 
@@ -55,8 +55,17 @@ function initRouter() {
                  如果有routerConfig的话
                  是一个字符串，那么是相对的路径，目前只有这种情况才能解决代码解析的问题
              */
-            if (staticRc && this.legoConfig) {
-                this.legoConfig.staticRouterConfig = require(staticRc);
+            if (this.legoConfig) {
+                // 优先判断routerConfigRelativePath
+                if (this.legoConfig.routerConfigRelativePath) {
+                    const rcPath = path.resolve(actionPathDir, this.legoConfig.routerConfigRelativePath);
+                    this.legoConfig.staticRouterConfig = require(rcPath);
+                    if (isDev) {
+                        collectFileAndChildren(rcPath);
+                    }
+                } else if (staticRc) {
+                    this.legoConfig.staticRouterConfig = require(staticRc);
+                }
             }
         }
         router.register(url, ['get', 'post'], [injector, actionConfig.action]);
