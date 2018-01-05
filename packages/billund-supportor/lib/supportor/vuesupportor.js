@@ -259,11 +259,11 @@ class VueSupportor extends BaseSupportor {
             return;
         }
 
-        const prevRouterConfig = window[renderEnums.KEY_ROUTER_CONFIG];
+        const prevRouterConfig = window[renderEnums.KEY_ROUTER_CONFIG] || {};
         (prevRouterConfig.routes || []).forEach((route) => {
             delete route.props;
         });
-        routerConfig = mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
+        routerConfig = mixVueRouterConfig(routerConfig, prevRouterConfig);
 
         const routes = routerConfig.routes;
         const rootPathIndex = routes.findIndex((route) => {
