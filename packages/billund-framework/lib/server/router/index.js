@@ -51,8 +51,10 @@ function assemblyRouters(context, config, widgets) {
             vueRouterUtil = require('./lib/vue.js');
         }
         const ret = vueRouterUtil.createRouter(context, config, widgets);
-        vueRouter = ret.router;
-        routerConfig = ret.routerConfig;
+        if (ret) {
+            vueRouter = ret.router;
+            routerConfig = ret.routerConfig;
+        }
     }
 
     widgets.forEach((widget) => {
