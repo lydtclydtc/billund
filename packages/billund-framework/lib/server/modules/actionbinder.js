@@ -7,19 +7,25 @@ const _ = require('lodash');
 const legoUtils = require('billund-utils');
 const decache = require('decache');
 
-const debug = require('debug');
 const gaze = require('gaze');
-const log = debug('billund-action-binder:info');
 
 /*
-    记录的action路径
     watch变化的文件路径
     router实例
  */
-let storeActionPaths = null;
 let watchFiles = [];
 let routerIns = null;
 let watched = false;
+/*
+    url2ActionConfig的数据设计：
+    key: url[String],
+    value: actonConfig {
+        actionPath: [String], // action的路径
+        action: [GeneratorFunction], // 用以执行的迭代器函数
+        routerConfig: String // routerConfig路径
+    }
+ */
+let url2ActionConfig = null;
 
 /**
  * 初始化router
@@ -78,24 +84,12 @@ function initRouter() {
         }
     }
 
-    (storeActionPaths || []).forEach((action) => {
-        let actionConfig = null;
-        try {
-            actionConfig = require(action);
-        } catch (e) {
-            console.error(e);
-            return true;
-        }
-
-        // 如果没有要的属性,就过滤掉
-        if (!(actionConfig && actionConfig.url)) return true;
-
-        const urls = _.isArray(actionConfig.url) ? actionConfig.url : [actionConfig.url];
-
-        urls.forEach((url) => {
-            registUrlToAction(url, actionConfig, action);
-        });
+    Object.keys(url2ActionConfig).forEach((url) => {
+        const actionConfig = url2ActionConfig[url];
+        const actionPath = actionConfig.actionPath;
+        registUrlToAction(url, actionConfig, actionPath);
     });
+
     routerIns = router.routes();
     if (!watched) {
         watchFilesChange();
@@ -112,9 +106,6 @@ function updateRouter() {
         console.log(`${file} decache.`);
     });
     initRouter();
-    storeActionPaths.forEach((action) => {
-        log(`${action} action update.`);
-    });
 }
 
 /**
@@ -173,21 +164,60 @@ function collectFileAndChildren(pathname) {
 }
 
 /**
+ * 准备action的map
+ *
+ * @param  {Object} config - 对应的配置项目
+ * @return {Object}
+ */
+function prepareUrl2ActionConfig(config) {
+    /*
+        优先判断url2ActionConfig
+     */
+    if (config.url2ActionConfig) {
+        return Object.assign({}, config.url2ActionConfig);
+    }
+    const ret = {};
+    const storeActionPaths = legoUtils.common.getFilteredFiles(config.actionDir, {
+        nameRegex: config.nameRegex
+    });
+    (storeActionPaths || []).forEach((action) => {
+        let actionConfig = null;
+        try {
+            actionConfig = require(action);
+        } catch (e) {
+            console.error(e);
+            return true;
+        }
+
+        // 如果没有要的属性,就过滤掉
+        if (!(actionConfig && actionConfig.url)) return true;
+
+        const urls = _.isArray(actionConfig.url) ? actionConfig.url : [actionConfig.url];
+
+        urls.forEach((url) => {
+            ret[url] = Object.assign({
+                actionPath: action
+            }, actionConfig);
+        });
+    });
+    return ret;
+}
+
+/**
  * 绑定对应的action到routers中
  *
  * @param  {Object} config - 对应的配置项目,字段如下:
  * {
  *      actionDir: [String], // action的文件夹名称
+ *      url2ActionConfig: [Object], // action的url与actionConfig的映射
  *      nameRegex: [Regex|String] // 名称的正则
  *      fallbackUrl: [String] // 降级的url
  * }
  */
 function bindActionRouter(config) {
-    if (!(config && config.actionDir)) throw new Error('missing actionDir config in lego framework');
+    if (!(config && (config.actionDir || config.url2ActionConfig))) throw new Error('missing actionDir or url2ActionConfig config in lego framework');
 
-    storeActionPaths = legoUtils.common.getFilteredFiles(config.actionDir, {
-        nameRegex: config.nameRegex
-    });
+    url2ActionConfig = prepareUrl2ActionConfig(config);
     initRouter();
 }
 

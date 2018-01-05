@@ -3879,11 +3879,11 @@ var VueSupportor = function (_BaseSupportor) {
                 return;
             }
 
-            var prevRouterConfig = window[renderEnums.KEY_ROUTER_CONFIG];
+            var prevRouterConfig = window[renderEnums.KEY_ROUTER_CONFIG] || {};
             (prevRouterConfig.routes || []).forEach(function (route) {
                 delete route.props;
             });
-            routerConfig = mixVueRouterConfig(routerConfig, window[renderEnums.KEY_ROUTER_CONFIG]);
+            routerConfig = mixVueRouterConfig(routerConfig, prevRouterConfig);
 
             var routes = routerConfig.routes;
             var rootPathIndex = routes.findIndex(function (route) {
