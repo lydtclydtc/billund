@@ -45,6 +45,7 @@ function mixVueRouterConfig(to, source) {
     if (!(to || source)) return null;
 
     to = Object.assign({}, to);
+    source = source || {};
     const routes = [];
     /*
         先对to的routes进行遍历，mixin加入
