@@ -35,6 +35,7 @@ function addupRenderType(widgets) {
  * @param  {Object} context - koa上下文
  * @param  {Object} config - 配置
  * @param  {Array} widgets - 对应的重要组件
+ * @return {Object}
  */
 function assemblyRouters(context, config, widgets) {
     const renderTypes = addupRenderType(widgets);
@@ -44,16 +45,23 @@ function assemblyRouters(context, config, widgets) {
      */
     let reactRouter = null;
     let vueRouter = null;
+    let routerConfig = null;
     if (renderTypes.vue > 0) {
         if (!vueRouterUtil) {
             vueRouterUtil = require('./lib/vue.js');
         }
-        vueRouter = vueRouterUtil.createRouter(context, config, widgets);
+        const ret = vueRouterUtil.createRouter(context, config, widgets);
+        if (ret) {
+            vueRouter = ret.router;
+            routerConfig = ret.routerConfig;
+        }
     }
 
     widgets.forEach((widget) => {
         widget.router = widget.renderType == RENDER_TYPE.RENDER_TYPE_VUE ? vueRouter : reactRouter;
     });
+
+    return routerConfig;
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 {
   "name": "billund-supportor",
-  "version": "1.2.0-alpha.19",
+  "version": "1.2.0-alpha.27",
   "description": "billund browser supportor",
   "main": "built/billund-supportor.js",
   "scripts": {
@@ -21,7 +21,8 @@
     "es6-promise": "^4.0.5",
     "qs": "^6.3.1",
     "regenerator-runtime": "^0.10.3",
-    "compare-versions": "^3.0.0"
+    "compare-versions": "^3.0.0",
+    "deep-extend": "^0.5.0"
   },
   "devDependencies": {
     "rimraf": "^2.5.4",

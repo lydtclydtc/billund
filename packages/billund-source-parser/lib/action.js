@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const babylon = require('babylon');
 const traverse = require('babel-traverse').default;
 const babelTypes = require('babel-types');
@@ -161,32 +162,85 @@ function extractStoreConfig(source, state) {
  * 抓取router的配置
  *
  * @param  {String} source - 源代码
- * @param  {Object} state - 状态对象,有如下几个字段:
- * {
- *
- * }
  * @return {String}
  */
 function extractRouterConfig(source, state) {
     if (!source) return '';
 
     const ast = babylon.parse(source);
-    let routerConfigStr = '';
+    /*
+        总共有两种properties:
+        1: path
+        2: code
+     */
+    const pathProperties = [];
+    const codeProperties = [];
 
     traverse(ast, {
-        ObjectExpression(path) {
-            const properties = path.node.properties || [];
+        ObjectExpression(nodePath) {
+            const properties = nodePath.node.properties || [];
+            const relativePathProperty = properties.find((property) => {
+                return property.key.name === 'routerConfigPath' || property.key.value === 'routerConfigPath';
+            });
+            if (relativePathProperty) {
+                pathProperties.push(relativePathProperty);
+            }
             const configProperty = properties.find((property) => {
                 return property.key.name === 'routerConfig' || property.key.value === 'routerConfig';
             });
             if (!configProperty) return;
+            /*
+                判断是否来自于module.exports | export default，推入pathProperties
+                其他的推入propertiesOutOfExports
+             */
+            const exportsParent = nodePath.findParent((pa) => {
+                const isAssignmentExpression = pa.isAssignmentExpression();
+                if (!isAssignmentExpression) return false;
 
-            const value = configProperty.value;
-            routerConfigStr = source.substring(value.start, value.end);
+                const leftNode = pa.node.left;
+                if (!leftNode) return false;
+                return leftNode.object.name == 'module' && leftNode.property.name == 'exports';
+            });
+            if (exportsParent) {
+                pathProperties.push(configProperty);
+                return;
+            }
+
+            const exportDefaultParent = nodePath.findParent((pa) => {
+                return pa.isExportDefaultDeclaration();
+            });
+            if (exportDefaultParent) {
+                pathProperties.push(configProperty);
+                return;
+            }
+
+            codeProperties.push(configProperty);
         }
     });
+    /*
+        优先匹配pathProperties中的，这里面一定是一个路径字符串
+     */
+    if (pathProperties && pathProperties.length) {
+        const value = pathProperties[0].value;
+        let realPath = '';
+        if (babelTypes.isCallExpression(value)) {
+            realPath = source.substring(value.start, value.end).replace('__dirname', `'${state.dirname}'`);
+            realPath = `"${eval(realPath)}"`;
+        } else {
+            realPath = source.substring(value.start, value.end);
+        }
+        return `require(${realPath})`;
+    }
 
-    return routerConfigStr;
+    /*
+        其次匹配codeProperties,这里面是完整的代码
+     */
+    if (codeProperties && codeProperties.length) {
+        const value = codeProperties[0].value;
+        return source.substring(value.start, value.end);
+    }
+
+    return '';
 }
 
 /**

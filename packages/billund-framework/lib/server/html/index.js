@@ -24,6 +24,7 @@ const DEFAULT_HEADER_PLUGINS = [baseMetaPlugin, pageTitlePlugin];
 
 const widgetContentPlugin = require('./renderplugins/widgetcontents/index.js');
 const initialStatePlugin = require('./renderplugins/initialstate/index.js');
+const routerConfigPlugin = require('./renderplugins/routerconfig/index.js');
 const iosFixedStylePlugin = require('./renderplugins/iosfixedstyle/index.js');
 const mostImportantWidgetsTagPlugin = require('./renderplugins/mostimportantwidgetstag/index.js');
 const widgetConfigsPlugin = require('./renderplugins/widgetconfigs/index.js');
@@ -32,6 +33,7 @@ const backAutoRefreshPlugin = require('./renderplugins/backautorefresh/index.js'
 const DEFAULT_BODY_PLUGINS = [
     widgetContentPlugin,
     initialStatePlugin,
+    routerConfigPlugin,
     iosFixedStylePlugin,
     mostImportantWidgetsTagPlugin,
     widgetConfigsPlugin,
@@ -132,7 +134,7 @@ function* execute(context) {
     const staticResources = exportStaticResources(legoConfig, widgets);
 
     store.assemblyStore(legoConfig, mostImportantWidgets);
-    router.assemblyRouters(context, legoConfig, mostImportantWidgets);
+    const routerConfig = router.assemblyRouters(context, legoConfig, mostImportantWidgets);
 
     const combineResults = yield {
         important: renderMostImportantWidgets(context, mostImportantWidgets),
@@ -147,6 +149,7 @@ function* execute(context) {
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
         vendors: Object.assign({}, baseopt.vendors),
         storeData: originalStoreData,
+        routerConfig,
         widgets,
         mostImportantWidgets,
         executeResults: {

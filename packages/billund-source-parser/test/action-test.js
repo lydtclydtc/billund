@@ -8,6 +8,11 @@ const script = `
 
 function* action() {
 	console.log('a');
+	this.legoConfig = {
+		routerConfig: {
+			mode: 'hash'
+		}
+	};
 }
 module.exports = {
     url: '/demo/node/html/demoindex.:suffix',
@@ -15,4 +20,4 @@ module.exports = {
 };
 `;
 
-console.log(parser.extractActionPath(script));
+console.log(parser.extractRouterConfig(script));
