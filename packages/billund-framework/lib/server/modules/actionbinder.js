@@ -178,10 +178,10 @@ function prepareUrl2ActionConfig(config) {
     /*
         优先判断url2ActionConfig
      */
+    let ret = {};
     if (config.url2ActionConfig) {
-        return Object.assign({}, config.url2ActionConfig);
+        ret = Object.assign({}, config.url2ActionConfig);
     }
-    const ret = {};
     const storeActionPaths = legoUtils.common.getFilteredFiles(config.actionDir, {
         nameRegex: config.nameRegex
     });
