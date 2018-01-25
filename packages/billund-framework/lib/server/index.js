@@ -1,5 +1,7 @@
 'use strict';
 
+const compose = require('koa-compose');
+const co = require('co');
 const frameworkCore = require('billund-framework-core');
 const actionBinder = frameworkCore.actionBinder;
 const widgetsPool = frameworkCore.widgetsPool;
@@ -45,15 +47,18 @@ function init(config) {
     /**
      * lego的核心处理方法入口
      *
+     * @param {Object} context - 上下文
      * @param {GenerateFunction} next
      */
-    function* doRender(next) {
+    async function doRender(context, next) {
         try {
-            yield next;
-            if (!isLegoType(this)) return;
+            await next();
+            if (!isLegoType(context)) return;
 
-            // 真正的执行方法
-            yield worker.execute(this);
+            await co.wrap(function*() {
+                // 真正的执行方法
+                yield worker.execute(this);
+            });
         } catch (e) {
             /*
                 lego并不真正的处理错误,而是继续向外抛,直到有人处理
@@ -63,9 +68,8 @@ function init(config) {
             throw e;
         }
     }
-    return function* combineLego(next) {
-        yield doRender.call(this, actionBinder.getRouter().call(this, next));
-    };
+
+    return compose([doRender, actionBinder.getRouter()]);
 }
 
 module.exports = {

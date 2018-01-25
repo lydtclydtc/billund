@@ -3641,6 +3641,7 @@ function mixVueRouterConfig(to, source) {
     if (!(to || source)) return null;
 
     to = _extends({}, to);
+    source = source || {};
     var routes = [];
     /*
         先对to的routes进行遍历，mixin加入
