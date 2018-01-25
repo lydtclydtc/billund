@@ -1,6 +1,6 @@
 {
   "name": "billund-framework",
-  "version": "1.3.0-alpha.0",
+  "version": "1.3.0-alpha.1",
   "description": "billund framework isomorphic",
   "main": "./lib/server/index.js",
   "keywords": [
@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "koa-router": "^5.2.3",
-    "billund-framework-core": "^1.3.0-alpha.0"
+    "billund-framework-core": "^1.3.0-alpha.1"
   },
   "peerDependencies": {
     "koa": "^1.0.0"
