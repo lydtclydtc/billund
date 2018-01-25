@@ -1,8 +1,9 @@
 'use strict';
 
-const actionBinder = require('./modules/actionbinder.js');
-const widgetsPool = require('./modules/widgetspool.js');
-const worker = require('./html/index.js');
+const frameworkCore = require('billund-framework-core');
+const actionBinder = frameworkCore.actionBinder;
+const widgetsPool = frameworkCore.widgetsPool;
+const worker = frameworkCore.worker;
 
 /**
  * 初始化函数
