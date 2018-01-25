@@ -5,7 +5,7 @@ const widgetsPool = require('./modules/widgetspool.js');
 const worker = require('./html/index.js');
 
 module.exports = {
-	actionBinder,
+    actionBinder,
     widgetsPool,
     worker
 };

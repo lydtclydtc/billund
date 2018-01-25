@@ -34,7 +34,7 @@
     "vue-server-renderer": "^2.0.0",
     "vuex": "^2.0.0",
     "vue-router": "^2.0.0",
-    "koa-router": "^5.2.3 || ^7.0.0",
+    "koa-router": "^5.2.3 || ^7.0.0"
   },
   "author": "robin.li",
   "license": "MIT"

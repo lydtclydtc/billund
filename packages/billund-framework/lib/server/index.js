@@ -1,7 +1,7 @@
 'use strict';
 
 const frameworkCore = require('billund-framework-core');
-const actionBinder = frameworkCore.frameworkCore;
+const actionBinder = frameworkCore.actionBinder;
 const widgetsPool = frameworkCore.widgetsPool;
 const worker = frameworkCore.worker;
 
