@@ -39,7 +39,7 @@
     "happypack": "^3.0.0",
     "ignore-loader": "^0.1.1",
     "json-loader": "^0.5.4",
-    "koa": "^1.0.0",
+    "koa": "^2.4.1",
     "less": "^2.7.2",
     "less-loader": "^4.0.0",
     "lodash": "^4.15.0",
