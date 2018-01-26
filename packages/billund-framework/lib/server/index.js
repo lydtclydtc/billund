@@ -55,9 +55,9 @@ function init(config) {
             await next();
             if (!isLegoType(context)) return;
 
-            await co.wrap(function*() {
+            await co(function*() {
                 // 真正的执行方法
-                yield worker.execute(this);
+                yield worker.execute(context);
             });
         } catch (e) {
             /*
