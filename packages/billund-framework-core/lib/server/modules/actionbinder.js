@@ -6,6 +6,7 @@ const path = require('path');
 const _ = require('lodash');
 const legoUtils = require('billund-utils');
 const decache = require('decache');
+const convert = require('koa-convert');
 
 const gaze = require('gaze');
 
@@ -26,6 +27,7 @@ let watched = false;
     }
  */
 let url2ActionConfig = null;
+let initedConfig = null;
 
 /**
  * 初始化router
@@ -55,7 +57,7 @@ function initRouter() {
             staticRc = path.resolve(actionPathDir, actionConfig.routerConfig);
         }
 
-        function* injector(next) {
+        let injector = function* injector(next) {
             yield next;
             /*
                  如果有routerConfig的话
@@ -78,8 +80,13 @@ function initRouter() {
                     this.legoConfig.staticRouterConfig = require(staticRc);
                 }
             }
+        };
+        let action = actionConfig.action;
+        if (initedConfig && initedConfig.koa2) {
+            injector = convert(injector);
+            action = convert(actionConfig.action);
         }
-        router.register(url, ['get', 'post'], [injector, actionConfig.action]);
+        router.register(url, ['get', 'post'], [injector, action]);
         /*
             如果是dev的话，加入watchFile
         */
@@ -222,6 +229,7 @@ function prepareUrl2ActionConfig(config) {
 function bindActionRouter(config) {
     if (!(config && (config.actionDir || config.url2ActionConfig))) throw new Error('missing actionDir or url2ActionConfig config in lego framework');
 
+    initedConfig = Object.assign({}, config);
     url2ActionConfig = prepareUrl2ActionConfig(config);
     initRouter();
 }
