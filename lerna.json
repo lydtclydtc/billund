@@ -3,5 +3,9 @@
   "packages": [
     "packages/*"
   ],
+<<<<<<< 4f43a2ba96dbd14c4c4f877e397a4c0092f016e2
   "version": "1.3.0-alpha.2"
+=======
+  "version": "2.0.0-alpha.0"
+>>>>>>> v2.0.0-alpha.0
 }
