@@ -1,6 +1,6 @@
 {
   "name": "billund-framework-core",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0-alpha.1",
   "description": "billund framework isomorphic core",
   "main": "./lib/server/index.js",
   "keywords": [
@@ -12,8 +12,8 @@
     "co": "^4.6.0",
     "debug": "^2.3.3",
     "decache": "^4.1.0",
-    "billund-enums": "^2.0.0-alpha.0",
-    "billund-utils": "^2.0.0-alpha.0",
+    "billund-enums": "^2.0.0-alpha.1",
+    "billund-utils": "^2.0.0-alpha.1",
     "lodash": "^4.15.0",
     "lru-cache": "^4.0.1",
     "ejs": "^2.0.0",
