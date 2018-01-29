@@ -15,7 +15,7 @@ const Billund = require('billund');
 const meta = require('./mods/renderplugins/meta/index.js');
 const staticResource = require('./mods/renderplugins/staticresource/index.js');
 
-const app = koa();
+const app = new koa();
 const legoConfig = require('./package.json').legoconfig;
 
 /**
