@@ -26,7 +26,8 @@ const worker = frameworkCore.worker;
 function init(config) {
     actionBinder.bindActionRouter(Object.assign({}, config, {
         actionDir: config.actionDir,
-        nameRegex: config.actionNameRegex
+        nameRegex: config.actionNameRegex,
+        koa2: true
     }));
     widgetsPool.bindWidgets({
         widgetDir: config.widgetDir,
