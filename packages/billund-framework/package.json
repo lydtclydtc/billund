@@ -3,6 +3,9 @@
   "version": "2.0.0-alpha.1",
   "description": "billund framework isomorphic",
   "main": "./lib/server/index.js",
+  "engines": {
+    "node": ">= 8.1.4"
+  },
   "keywords": [
     "billund",
     "framework",
