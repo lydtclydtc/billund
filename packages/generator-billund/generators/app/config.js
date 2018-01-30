@@ -20,11 +20,11 @@ const pkgs = {
     },
     base: {
         del: '^2.2.0',
-        koa: '^1.0.0',
-        'billund-enums': '^1.0.0-alpha.1',
-        'billund': '^1.0.0-alpha.1',
-        'billund-source-parser': '^1.0.0-alpha.1',
-        'billund-utils': '^1.0.0-alpha.1',
+        koa: '^2.0.0',
+        'billund-enums': '^2.0.0-alpha.1',
+        'billund': '^2.0.0-alpha.1',
+        'billund-source-parser': '2.0.0-alpha.1',
+        'billund-utils': '^2.0.0-alpha.1',
         'babel-core': '^6.3.15',
         'babel-loader': '^6.2.0',
         'babel-plugin-add-module-exports': '^0.2.1',
@@ -50,9 +50,9 @@ const pkgs = {
         'node-uuid': '^1.4.7',
         'style-loader': '^0.13.0',
         webpack: '^2.0.0',
-        'billund-action-loader': '^1.0.0-alpha.1',
-        'billund-config-loader': '^1.0.0-alpha.1',
-        'billund-supportor-preprocessor-loader': '^1.0.0-alpha.1'
+        'billund-action-loader': '^1.3.0-alpha.0',
+        'billund-config-loader': '^1.3.0-alpha.0',
+        'billund-supportor-preprocessor-loader': '^1.3.0-alpha.0'
     }
 };
 

@@ -10,12 +10,12 @@ const serverConfig = require('./webpack/server/widget.config.js');
 
 const path = require('path');
 const co = require('co');
-const koa = require('koa');
+const Koa = require('koa');
 const Billund = require('billund');
 const meta = require('./mods/renderplugins/meta/index.js');
 const staticResource = require('./mods/renderplugins/staticresource/index.js');
 
-const app = koa();
+const app = new Koa();
 const legoConfig = require('./package.json').legoconfig;
 
 /**
