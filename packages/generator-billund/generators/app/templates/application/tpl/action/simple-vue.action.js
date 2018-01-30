@@ -1,7 +1,7 @@
 'use strict';
 
-function* action() {
-    this.legoConfig = {
+async function action(context) {
+    context.legoConfig = {
         widgets: [{
             name: 'simple-vue-widget',
             params: {
