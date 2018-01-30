@@ -12,10 +12,11 @@ const pkgs = {
     },
     vue: {
         'vue-loader': '^10.0.0',
-        'vue-template-compiler': '2.1.6',
-        vue: '2.1.6',
-        'vue-server-renderer': '2.1.6',
-        vuex: '2.0.0'
+        'vue-template-compiler': '^2.0.0',
+        vue: '^2.0.0',
+        'vue-server-renderer': '^2.0.0',
+        vuex: '^2.0.0',
+        'vue-router': '^2.0.0'
     },
     base: {
         del: '^2.2.0',
