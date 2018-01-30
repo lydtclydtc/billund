@@ -1,6 +1,6 @@
 {
   "name": "billund-framework",
-  "version": "2.0.0-alpha.6",
+  "version": "2.0.0-alpha.7",
   "description": "billund framework isomorphic",
   "main": "./lib/server/index.js",
   "engines": {
@@ -15,7 +15,7 @@
     "co": "^4.6.0",
     "koa-compose": "^4.0.0",
     "koa-router": "^7.0.0",
-    "billund-framework-core": "^2.0.0-alpha.6"
+    "billund-framework-core": "^2.0.0-alpha.7"
   },
   "peerDependencies": {
     "koa": "^2.0.0"
