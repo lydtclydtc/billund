@@ -144,7 +144,7 @@ function* execute(context) {
     const successWidgets = combineResults.important.successWidgets;
     const failWidgets = _.extend(combineResults.important.failWidgets, combineResults.other);
 
-    const pluginConfig = {
+    let pluginConfig = {
         noServerRender: !!legoConfig.noServerRender,
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
         vendors: Object.assign({}, baseopt.vendors),
@@ -159,6 +159,10 @@ function* execute(context) {
         staticResources,
         options: legoConfig.options
     };
+    if (baseopt && baseopt.beforeExecutePlugins) {
+        const newPluginConfig = yield baseopt.beforeExecutePlugins(pluginConfig, context);
+        pluginConfig = Object.assign(pluginConfig, newPluginConfig);
+    }
     /*
         接着，就是运行的核心流程了,通过各种plugins来生成html
         分为两种种plugins:
