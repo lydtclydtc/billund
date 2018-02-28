@@ -144,6 +144,7 @@ function watchFilesChange() {
  * @param  {String} pathname - 当前文件
  */
 function collectFileAndChildren(pathname) {
+    if (!pathname) return;
     // 如果已经监听过，不做收集
     if (watched) return;
     // 因为超过调用上限的问题，不监听node_modules下的变化
