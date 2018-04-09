@@ -10,5 +10,6 @@ module.exports = {
     commonChunkName: 'next-vendor',
     commonChunkModules: ['billund-next', 'billund-next-core'],
     pageConfigDir: path.resolve(cwd, './pageconfig/'),
-    pageConfigPattern: '**/*.pageconfig.json'
+    pageConfigPattern: '**/*.pageconfig.json',
+    widgetRegExp: /\.widget\.json/
 };

@@ -14,7 +14,16 @@
     "ejs": "^2.0.0",
     "lodash": "^4.15.0",
     "glob": "^7.1.2",
-    "koa-convert": "^1.2.0"
+    "koa-convert": "^1.2.0",
+    "loader-utils": "^1.1.0",
+    "source-map": "^0.6.1",
+    "hash-sum": "^1.0.2",
+    "vue-template-compiler": "^2.0.0",
+    "webpack": "^2.0.0",
+    "babel-generator": "^6.22.0",
+    "babel-traverse": "^6.22.1",
+    "babel-types": "^6.22.0",
+    "babylon": "^6.15.0"
   },
   "peerDependencies": {
     "vue": "^2.0.0",
