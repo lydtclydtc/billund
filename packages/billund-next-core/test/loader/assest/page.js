@@ -1,7 +1,7 @@
 'use strict';
 
 import mid from './mid.widget.json';
-import small from './small.widget.json';
+const small = require('./small.widget.json');
 
 export default {
     components: {

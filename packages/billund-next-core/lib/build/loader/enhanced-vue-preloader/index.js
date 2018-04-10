@@ -5,6 +5,7 @@ const loaderUtils = require('loader-utils');
 
 const parse = require('./parser');
 const scriptCompiler = require('./script-compiler');
+const templateCompiler = require('./template-compiler');
 
 module.exports = function(content) {
     const loaderContext = this;
@@ -43,16 +44,26 @@ module.exports = function(content) {
 
     let widgets = [];
     let widgetVariablesInTemplate = [];
+    let widgetInfos = [];
 
     const scriptContent = scriptCompiler.getContent.call(this, parts.script);
     if (scriptContent) {
         widgets = scriptCompiler.matchWidgets.call(this, scriptContent, options);
         widgetVariablesInTemplate = scriptCompiler.matchWidgetVariablesInTemplate.call(this, scriptContent, widgets);
-        console.log('-----------------------');
-        console.log(widgets);
-        console.log(widgetVariablesInTemplate);
     }
 
+    // 用this.data去share数据
+    const templateContent = templateCompiler.getContent.call(this, parts.template);
+    if (templateContent) {
+        widgetInfos = templateCompiler.extractWidgets.call(this, templateContent, widgetVariablesInTemplate, isServer);
+    }
+
+    console.log('------------------------------widgets-----------------------------');
+    console.log(widgets);
+    console.log('------------------------------widgetVariablesInTemplate-----------------------------');
+    console.log(widgetVariablesInTemplate);
+    console.log('------------------------------widgetInfos-----------------------------');
+    console.log(widgetInfos);
 
     return content;
 };
