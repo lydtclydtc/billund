@@ -3,7 +3,10 @@
 const path = require('path');
 
 module.exports = {
-    entry: path.resolve(__dirname, './assest/page.vue'),
+    entry: {
+        page: path.resolve(__dirname, './assest/page.vue'),
+        test: path.resolve(__dirname, './assest/test.vue')
+    },
     output: {
         path: path.join(__dirname, './dist/server/'),
         filename: '[name].js',

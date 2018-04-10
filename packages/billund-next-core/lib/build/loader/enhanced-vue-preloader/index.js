@@ -3,6 +3,7 @@
 const path = require('path');
 const loaderUtils = require('loader-utils');
 
+const cache = require('../common/cache');
 const parse = require('./parser');
 const scriptCompiler = require('./script-compiler');
 const templateCompiler = require('./template-compiler');
@@ -58,12 +59,18 @@ module.exports = function(content) {
         widgetInfos = templateCompiler.extractWidgets.call(this, templateContent, widgetVariablesInTemplate, isServer);
     }
 
-    console.log('------------------------------widgets-----------------------------');
-    console.log(widgets);
-    console.log('------------------------------widgetVariablesInTemplate-----------------------------');
-    console.log(widgetVariablesInTemplate);
-    console.log('------------------------------widgetInfos-----------------------------');
-    console.log(widgetInfos);
+    setCache(this, {
+        widgets,
+        widgetVariablesInTemplate,
+        widgetInfos
+    });
+
+    console.log(this.data && this.data.billundVueCache);
 
     return content;
 };
+
+function setCache(ctx, data) {
+    const key = ctx.resourcePath;
+    cache.set(key, data);
+}
