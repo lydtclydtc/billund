@@ -2,8 +2,9 @@
 
 const path = require('path');
 const fs = require('fs');
-const compiler = require('vue-template-compiler');
 const hash = require('hash-sum');
+const jsdom = require('jsdom');
+const cwd = process.cwd();
 
 function getContent(template) {
     if (!template) {
@@ -15,42 +16,41 @@ function getContent(template) {
     }) : template.content;
 }
 
-function extractWidgets(content, widgetVariables, isServer) {
+function extractWidgets(content, widgetVariables) {
+    const dom = new jsdom.JSDOM(content);
+    const doc = dom.window.document;
     widgetVariables = widgetVariables || [];
-
     const rets = {};
 
-    const compile =
-        isServer && compiler.ssrCompile ?
-        compiler.ssrCompile :
-        compiler.compile;
-    compile(content, {
-        modules: [{
-            preTransformNode(el) {
-                const tag = el.tag;
-                if (widgetVariables.indexOf(tag) === -1) return el;
+    widgetVariables.forEach((variable) => {
+        const tag = variable.key;
+        const eles = Array.prototype.slice.call(doc.querySelectorAll(tag));
+        if (!(eles && eles.length)) return;
 
-                const attrsMap = el.attrsMap;
-                const isKeystone = !!(attrsMap && attrsMap.keystone && attrsMap.keystone === 'true');
+        const arr = eles.map((el) => {
+            const keystone = el.getAttribute('keystone');
+            return {
+                tag,
+                variable: variable.value,
+                keystone: !!keystone
+            };
+        });
 
-                if (!rets[tag]) {
-                    rets[tag] = [];
-                }
-                rets[tag].push({
-                    tag,
-                    keystone: isKeystone
-                });
-                return el;
-            }
-        }]
+        if (!rets[tag]) {
+            rets[tag] = [];
+        }
+        rets[tag] = rets[tag].concat(arr);
     });
+
+    const relativePath = path.relative(cwd, this.resourcePath);
     Object.keys(rets).forEach((key) => {
         rets[key] = rets[key].map((item, index) => {
             return Object.assign(item, {
-                id: hash(`${this.resourcePath}-${item.tag}-${index}`)
+                id: item.tag + '-' + hash(`${relativePath}-${item.tag}-${index}`)
             });
         });
     });
+
     return rets;
 }
 

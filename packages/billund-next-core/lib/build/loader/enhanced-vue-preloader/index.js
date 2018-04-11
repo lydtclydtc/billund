@@ -9,6 +9,8 @@ const scriptCompiler = require('./script-compiler');
 const templateCompiler = require('./template-compiler');
 
 module.exports = function(content) {
+    if (cache.get(this.resourcePath)) return content;
+
     const loaderContext = this;
     const isServer = this.target === 'node';
     const isProduction = this.minimize || process.env.NODE_ENV === 'production';
@@ -53,24 +55,31 @@ module.exports = function(content) {
         widgetVariablesInTemplate = scriptCompiler.matchWidgetVariablesInTemplate.call(this, scriptContent, widgets);
     }
 
-    // 用this.data去share数据
     const templateContent = templateCompiler.getContent.call(this, parts.template);
     if (templateContent) {
         widgetInfos = templateCompiler.extractWidgets.call(this, templateContent, widgetVariablesInTemplate, isServer);
     }
 
-    setCache(this, {
+    if (!(widgetInfos && Object.keys(widgetInfos).length)) return content;
+
+    setCache(this, parts, {
         widgets,
         widgetVariablesInTemplate,
         widgetInfos
     });
 
-    console.log(this.data && this.data.billundVueCache);
-
     return content;
 };
 
-function setCache(ctx, data) {
+function setCache(ctx, parts, data) {
     const key = ctx.resourcePath;
     cache.set(key, data);
+    if (parts.script && parts.script.src) {
+        const scriptPath = path.resolve(ctx.resourcePath, `../${parts.script.src}`);
+        cache.set(scriptPath, data);
+    }
+    if (parts.template && parts.template.src) {
+        const templatePath = path.resolve(ctx.resourcePath, `../${parts.template.src}`);
+        cache.set(templatePath, data);
+    }
 }

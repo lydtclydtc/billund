@@ -95,7 +95,10 @@ function matchWidgetVariablesInTemplate(content, widgets) {
                 if (widgets.indexOf(value.name) === -1) return;
 
                 const key = property.key;
-                rets.push(babelTypes.isIdentifier(key) ? key.name : key.value);
+                rets.push({
+                    key: babelTypes.isIdentifier(key) ? key.name : key.value,
+                    value: value.name
+                });
             });
         }
     });

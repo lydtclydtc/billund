@@ -16,6 +16,14 @@ module.exports = {
         rules: [{
             test: /\.vue$/,
             use: [{
+                loader: 'vue-loader',
+                options: {
+                    preLoaders: {
+                        js: require.resolve('../../lib/build/loader/vue-preloader/script'),
+                        html: require.resolve('../../lib/build/loader/vue-preloader/template')
+                    }
+                }
+            }, {
                 loader: require.resolve('../../lib/build/loader/enhanced-vue-preloader/index'),
                 options: {
                     widgetRegExp: /\.widget\.json/

@@ -7,6 +7,5 @@ const webpackCompiler = webpack(config);
 webpackCompiler.run((err, stats) => {
     const errors = stats.compilation.errors;
     if (errors) {
-        console.log(errors);
     }
 })
