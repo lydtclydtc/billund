@@ -14,7 +14,7 @@ const baseMetaPlugin = require('./renderplugins/basemeta/index.js');
 const pageTitlePlugin = require('./renderplugins/pagetitle/index.js');
 const DEFAULT_HEADER_PLUGINS = [baseMetaPlugin, pageTitlePlugin];
 
-const pageHtmlPlugin = require('./renderplugins/pagehtml/index.js');
+const pageHtmlPlugin = require('./renderplugins/pagecontent/index.js');
 const initialStatePlugin = require('./renderplugins/initialstate/index.js');
 const iosFixedStylePlugin = require('./renderplugins/iosfixedstyle/index.js');
 const widgetPropsPlugin = require('./renderplugins/widgetprops/index.js');

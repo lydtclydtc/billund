@@ -29,11 +29,26 @@ module.exports = {
                     widgetRegExp: /\.widget\.json/
                 }
             }]
+        }, {
+            test: /\.widget\.json/,
+            use: [{
+                loader: 'babel-loader',
+                options: {
+                    babelrc: false,
+                    presets: ['es2015-node', 'stage-0'],
+                    cacheDirectory: false
+                }
+            }, {
+                loader: require.resolve('../../lib/build/loader/widget-loader/index')
+            }]
         }]
     },
     resolve: {
         // 添加后缀名顺序
-        extensions: ['.js', '.jsx', '.vue', '.less']
+        extensions: ['.js', '.jsx', '.vue', '.less'],
+        alias: {
+            'billund-next-core': require.resolve('../../lib/server/index.js')
+        }
     },
     target: 'node',
     devtool: false

@@ -24,6 +24,7 @@ const renderer = require('vue-server-renderer').createRenderer({
 function* render(context, pageConfig, store) {
     if (!pageConfig.page) throw new Error(`no page defined in ${pageConfig.file}`);
     const component = pageConfig.page;
+    component.store = store;
     /*
         判断，是否存在有routers，如果有的话，要提前初始化
      */
