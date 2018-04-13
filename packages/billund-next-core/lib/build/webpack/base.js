@@ -17,13 +17,13 @@ class WebpackBaseConfig {
     getEntries() {
         if (this.entries) return this.entries;
 
-        const files = pageConfigFinder.getFiles(this.appConfig);
+        const relativeFiles = pageConfigFinder.getFiles(this.appConfig);
         const dir = this.appConfig.pageConfigDir;
 
         const ret = {};
-        files.each((file) => {
-            const key = path.relative(dir, file);
-            ret[key] = file;
+        relativeFiles.forEach((rf) => {
+            const filePath = path.resolve(dir, rf);
+            ret[rf] = filePath;
         });
         return ret;
     }
@@ -33,7 +33,7 @@ class WebpackBaseConfig {
         const isServer = this.isServer;
         const distPath = isServer ? appConfig.serverDist : appConfig.browserDist;
         const ret = {
-            distPath,
+            path: distPath,
             filename: '[name].js'
         };
         if (isServer) {
@@ -98,7 +98,7 @@ class WebpackBaseConfig {
         };
     }
 
-    config() {
+    getConfig() {
         const entries = this.getEntries();
         const output = this.getOutput();
         const vueRules = this.getVueRules();
@@ -107,7 +107,9 @@ class WebpackBaseConfig {
         const config = {
             entry: entries,
             output,
-            rules: [vueRules, widgetRules],
+            module: {
+                rules: [vueRules, widgetRules]
+            },
             resolve: {
                 extensions: ['.js', '.jsx', '.vue', '.less']
             }

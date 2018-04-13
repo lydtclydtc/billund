@@ -18,20 +18,16 @@ let appConfig = null;
  */
 function* init($appConfig) {
     appConfig = configMerger($appConfig);
-
     if (appConfig.isDev) {
         const builderIns = builder.getInstance(appConfig);
         yield builderIns.build();
     }
-    const pageConfigs = pageConfigMatcher.matchPageConfigs({
-        dir: appConfig.pageConfigDir,
-        pattern: appConfig.pageConfigPattern,
-        serverDist: appConfig.serverDist,
-        browserDist: appConfig.browserDist
-    });
+
+    const pageConfigs = pageConfigMatcher.matchPageConfigs(appConfig);
     actionBinder.bindRouter({
         pageConfigs
     });
+
 
     const nextMiddleware = coreWorker.init(appConfig);
     /**

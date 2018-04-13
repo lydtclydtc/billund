@@ -8,8 +8,8 @@ class WebpackServerConfig extends WebpackBaseConfig {
             isServer: true
         });
     }
-    config() {
-        const config = super.config();
+    getConfig() {
+        const config = super.getConfig();
         return config;
     }
 }

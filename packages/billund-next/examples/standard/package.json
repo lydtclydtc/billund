@@ -4,5 +4,9 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt"
+  },
+  "dependencies": {
+    "co": "^4.6.0",
+    "koa": "^1.0.0"
   }
 }

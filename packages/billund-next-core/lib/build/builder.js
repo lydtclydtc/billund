@@ -3,6 +3,7 @@
 const fs = require('co-fs');
 const webpack = require('webpack');
 const EventEmitter = require('eventemitter3');
+const del = require('del');
 
 const configMerger = require('../common/config-merger');
 const WebpackServerConfig = require('./webpack/server');
@@ -37,13 +38,17 @@ class Builder extends EventEmitter {
         this._buildStatus = STATUS.BUILDING;
         const appConfig = this.appConfig;
 
-        console.log(`------------ srcDir: ${appConfig.srcDir} ---------------------------`);
-        console.log(`------------ rootDir: ${appConfig.rootDir} ---------------------------`);
         console.log(`-----------clear serverDist: ${appConfig.serverDist} ---------------`);
-        yield fs.rmdir(appConfig.serverDist);
+        const isServerDistExist = yield fs.exists(appConfig.serverDist);
+        if (isServerDistExist) {
+            yield del(appConfig.serverDist);
+        }
         if (!this.isDev) {
             console.log(`-----------clear browserDist: ${appConfig.browserDist} ---------------`);
-            yield fs.rmdir(appConfig.browserDist);
+            const isBrowserDistExist = yield fs.exists(appConfig.browserDist);
+            if (isBrowserDistExist) {
+                yield del(appConfig.browserDist);
+            }
         }
         yield this.serverBuild();
 
@@ -54,17 +59,14 @@ class Builder extends EventEmitter {
         const isDev = this.isDev;
 
         this.webpackServerConfig = new WebpackServerConfig(this.appConfig);
-        this.serverCompiler = webpack(this.webpackServerConfig);
+        this.serverCompiler = webpack(this.webpackServerConfig.getConfig());
         const initPromise = new Promise((resolve, reject) => {
             this.serverCompiler.run((err, stats) => {
-                stats = stats.toJson();
-                stats.errors.forEach((error) => {
-                    console.error(error);
-                });
-                stats.warnings.forEach((error) => {
-                    console.warn(error);
-                });
                 if (err || stats.hasErrors()) {
+                    stats = stats.toJson();
+                    stats.errors.forEach((error) => {
+                        console.error(error);
+                    });
                     const throwE = err ||
                         (stats.errors && stats.errors.length && stats.errors[0]) ||
                         new Error('webpack server inited compiled error!');
@@ -72,6 +74,11 @@ class Builder extends EventEmitter {
                     console.log(throwE.stack);
                     return;
                 }
+                stats = stats.toJson();
+                stats.warnings.forEach((error) => {
+                    console.warn(error);
+                });
+
                 resolve('done');
             });
         });
@@ -83,17 +90,19 @@ class Builder extends EventEmitter {
                 ignored: /node_modules/,
                 aggregateTimeout: 500
             }, (err, stats) => {
-                stats = stats.toJson();
-                stats.errors.forEach((error) => {
-                    console.error(error);
-                });
-                stats.warnings.forEach((error) => {
-                    console.warn(error);
-                });
                 if (err || stats.hasErrors()) {
+                    stats = stats.toJson();
+                    stats.errors.forEach((error) => {
+                        console.error(error);
+                    });
                     this.emit(SERVER_COMPILER_UPDATE_FAIL);
                     return;
                 }
+                stats = stats.toJson();
+                stats.warnings.forEach((error) => {
+                    console.warn(error);
+                });
+
                 this.emit(SERVER_COMPILER_UPDATE_SUCCESS);
             });
         }
