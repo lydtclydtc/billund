@@ -33,5 +33,6 @@ module.exports = {
     isObject,
     isString,
     after,
-    isArray
+    isArray,
+    isFunction
 };

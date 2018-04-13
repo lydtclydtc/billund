@@ -3,6 +3,7 @@
 const path = require('path');
 const glob = require('glob');
 const constants = require('../../common/constants.js');
+const pageConfigFinder = require('../../common/page-config-finder');
 
 function* defaultAction() {
     return Object.assign({}, constants.DEFAULT_LEGO_CONFIG);
@@ -28,13 +29,12 @@ function findPageConfigs(dir, pattern) {
  */
 function matchPageConfigs(config) {
     if (!config) throw new Error('missing page-config-matcher config');
-    if (!config.dir) throw new Error('missing dir in page-config-matcher config');
-    if (!config.pattern) throw new Error('missing pattern in page-config-matcher config');
+    if (!config.pageConfigDir) throw new Error('missing pageConfigDir in page-config-matcher config');
+    if (!config.pageConfigPattern) throw new Error('missing pageConfigPattern in page-config-matcher config');
     if (!config.serverDist) throw new Error('missing serverDist in page-config-matcher config');
     if (!config.browserDist) throw new Error('missing browserDist in page-config-matcher config');
 
-    const files = findPageConfigs(config.dir, config.pattern);
-    if (!(files && files.length)) throw new Error(`no page-config find in ${config.dir}, pattern is ${config.pattern}`);
+    const files = pageConfigFinder.getFiles(config);
 
     /*
         pageConfig的字段如下:
@@ -54,8 +54,8 @@ function matchPageConfigs(config) {
             browserEntry
             同时必须对必须字段做基本的检查 & 兼容
          */
-        const serverEntryPath = path.resolve(config.serverDist, path.relative(config.dir, file));
-        const browserEntryPath = path.resolve(config.browserDist, path.relative(config.dir, file));
+        const serverEntryPath = path.resolve(config.serverDist, path.relative(config.pageConfigDir, file));
+        const browserEntryPath = path.resolve(config.browserDist, path.relative(config.pageConfigDir, file));
         let serverEntry = null;
         try {
             serverEntry = require(serverEntryPath);

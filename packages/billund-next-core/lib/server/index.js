@@ -6,6 +6,7 @@ const coreWorker = require('./mods/core-worker');
 const actionBinder = require('./mods/action-binder');
 const parallel = require('./mods/parallel');
 const utils = require('../common/utils.js');
+const builder = require('../build/index');
 
 module.exports = {
     configMerger,
@@ -13,5 +14,6 @@ module.exports = {
     pageConfigMatcher,
     actionBinder,
     coreWorker,
-    utils
+    utils,
+    builder
 };

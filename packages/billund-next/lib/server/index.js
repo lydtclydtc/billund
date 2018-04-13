@@ -6,6 +6,7 @@ const pageConfigMatcher = core.pageConfigMatcher;
 const actionBinder = core.actionBinder;
 const coreWorker = core.coreWorker;
 const configMerger = core.configMerger;
+const builder = core.builder;
 
 let appConfig = null;
 
@@ -15,8 +16,13 @@ let appConfig = null;
  * @param  {Object} $appConfig - app的配置
  * @return {GeneratorFunction}
  */
-function init($appConfig) {
+function* init($appConfig) {
     appConfig = configMerger($appConfig);
+
+    if (appConfig.isDev) {
+        const builderIns = builder.getInstance(appConfig);
+        yield builderIns.build();
+    }
     const pageConfigs = pageConfigMatcher.matchPageConfigs({
         dir: appConfig.pageConfigDir,
         pattern: appConfig.pageConfigPattern,
