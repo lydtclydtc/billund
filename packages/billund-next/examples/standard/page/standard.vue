@@ -1,26 +1,31 @@
 <template>
 	<div class="standard-page">
 		standard-page
-		<header :msg="headerMsg"></header>
-		<body :msg="headerMsg"></body>
+		<header :msg="storeData.tag"></header>
+		<content :msg="storeData.tag"></content>
 	</div>
 </template>
 <script type="es6">
 	'use strict';
 
-	import header from '../widegt/header/index.widget.json';
-	import body from '../widget/body/index.widget.json';
+	import header from '../widget/header/index.widget.json';
+	import content from '../widget/body/index.widget.json';
 
 	export default {
 		components: {
 			header,
-			body
+			content
 		},
 		data() {
 			return {
 				headerMsg: 'standard-header',
 				bodyMsg: 'standard-body'
 			};
+		},
+		computed: {
+			storeData(state){
+				return this.$store.state;
+			}
 		}
 	};
 </script>

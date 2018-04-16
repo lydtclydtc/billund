@@ -42,7 +42,7 @@ function initRouter() {
         register(pc.url, pc);
     });
 
-    routerIns = router.routes();
+    routerIns = route.routes();
 }
 
 /**

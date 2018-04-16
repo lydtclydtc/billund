@@ -23,7 +23,7 @@ const renderer = require('vue-server-renderer').createRenderer({
  */
 function* render(context, pageConfig, store) {
     if (!pageConfig.page) throw new Error(`no page defined in ${pageConfig.file}`);
-    const component = pageConfig.page;
+    const component = Object.assign({}, pageConfig.page);
     component.store = store;
     /*
         判断，是否存在有routers，如果有的话，要提前初始化
@@ -35,7 +35,7 @@ function* render(context, pageConfig, store) {
     }
 
     return yield new Promise((resolve, reject) => {
-        renderer.renderToString(component, (error, html) => {
+        renderer.renderToString(new Vue(component), (error, html) => {
             if (error) {
                 console.error(`${pageConfig.file} render error!
                                 ${error.stack}`);

@@ -8,9 +8,12 @@ const ACTION_KEY_INIT_WIDGET_STATE = '__billund_init_widget_state';
 const SERVER_COMPILER_UPDATE_SUCCESS = '__server_compiler_update_success';
 const SERVER_COMPILER_UPDATE_FAIL = '__server_compiler_update_fail';
 
+const WIDGET_PROPS = '__billund_next_widget_props';
+
 module.exports = {
     DEFAULT_LEGO_CONFIG,
     ACTION_KEY_INIT_WIDGET_STATE,
     SERVER_COMPILER_UPDATE_SUCCESS,
-    SERVER_COMPILER_UPDATE_FAIL
+    SERVER_COMPILER_UPDATE_FAIL,
+    WIDGET_PROPS
 };

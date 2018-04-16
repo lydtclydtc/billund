@@ -28,7 +28,6 @@ function* init($appConfig) {
         pageConfigs
     });
 
-
     const nextMiddleware = coreWorker.init(appConfig);
     /**
      * 判断当前的处理action是否是由billund-next处理
@@ -51,7 +50,7 @@ function* init($appConfig) {
             if (!isLegoType(this)) return;
 
             // 真正的执行方法
-            yield nextMiddleware.execute(this);
+            yield nextMiddleware(this);
         } catch (e) {
             /*
                 lego并不真正的处理错误,而是继续向外抛,直到有人处理

@@ -11,8 +11,3 @@
 </template>
 <script src="./page.js">
 </script>
-<style lang="less">
-	.lego-page{
-		background-color: #fff;
-	}
-</style>

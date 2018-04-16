@@ -17,14 +17,14 @@ const DEFAULT_HEADER_PLUGINS = [baseMetaPlugin, pageTitlePlugin];
 const pageHtmlPlugin = require('./renderplugins/pagecontent/index.js');
 const initialStatePlugin = require('./renderplugins/initialstate/index.js');
 const iosFixedStylePlugin = require('./renderplugins/iosfixedstyle/index.js');
-const widgetPropsPlugin = require('./renderplugins/widgetprops/index.js');
 const backAutoRefreshPlugin = require('./renderplugins/backautorefresh/index.js');
+const widgetPropsPlugin = require('./renderplugins/widgetprops/index.js');
 const DEFAULT_BODY_PLUGINS = [
     pageHtmlPlugin,
     initialStatePlugin,
     iosFixedStylePlugin,
-    widgetPropsPlugin,
-    backAutoRefreshPlugin
+    backAutoRefreshPlugin,
+    widgetPropsPlugin
 ];
 
 const DEFAULT_LAYOUT = path.resolve(__dirname, '../../layout/default.html');
@@ -69,17 +69,19 @@ function* execute(context) {
     const originalStoreData = Object.assign({}, legoConfig.storeData);
     const pageConfig = legoConfig['__pageConfig'];
 
-    const store = storeUtil.createStore(this, legoConfig.storeData, pageConfig.store || {});
-    const pageHtml = yield renderUtil.render(this, pageConfig, store);
-    const staticResources = getStaticResources(this, pageConfig);
+    const store = storeUtil.createStore(context, legoConfig.storeData, pageConfig.store || {});
+    const pageHtml = yield renderUtil.render(context, pageConfig, store);
+    const staticResources = getStaticResources(context, pageConfig);
 
     let pluginConfig = {
         noServerRender: !!legoConfig.noServerRender,
         allowShowEvenFailed: !!legoConfig.allowShowEvenFailed,
         pageHtml,
+        store,
         storeData: originalStoreData,
         staticResources,
-        options: legoConfig.options
+        options: legoConfig.options,
+        widgetStates: legoConfig['__widgetStates']
     };
     /*
         接着，就是运行的核心流程了,通过各种plugins来生成html
@@ -147,13 +149,18 @@ function* execute(context) {
 }
 
 function getStaticResources(context, pageConfig) {
-    return [{
-        styles: `${appConfig.browserDist}${appConfig.commonChunkName}.css`,
-        entry: `${appConfig.browserDist}${appConfig.commonChunkName}.js`
-    }, {
-        styles: `${pageConfig.browserEntry.replace('.js', '.css')}`,
-        entry: `${pageConfig.browserEntry}`
-    }];
+    const rets = [];
+    if (appConfig.build && appConfig.build && appConfig.build.browser && appConfig.build.browser.commonChunkName) {
+        rets.push({
+            styles: `${appConfig.browserDist}${appConfig.build.browser.commonChunkName}.css`,
+            entry: `${appConfig.browserDist}${appConfig.build.browser.commonChunkName}.js`
+        });
+    }
+    rets.push({
+        styles: `${pageConfig.browserBundleForStyles}`,
+        entry: `${pageConfig.browserBundle}`
+    });
+    return rets;
 }
 
 function getLayout(pageConfig) {
@@ -168,6 +175,13 @@ function getLayout(pageConfig) {
     return htmlStr;
 }
 
+function storeWidgetState(ctx, widgetId, state) {
+    ctx.legoConfig['__widgetStates'] = Object.assign({}, ctx.legoConfig['__widgetStates'], {
+        [widgetId]: state
+    });
+}
+
 module.exports = {
-    init
+    init,
+    storeWidgetState
 };

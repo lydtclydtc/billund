@@ -68,10 +68,11 @@ module.exports = function(source) {
     	const core = require('billund-next-core');
     	const utils = core.utils;
     	const parallel = core.parallel;
+        const coreWorker = core.coreWorker;
 	
 		${dataGeneratorStr}
 		${storeConfigStr}
-		const template = require('${propertiesMap.template}');
+		const template = require('${propertiesMap.template}').default || require('${propertiesMap.template}');
 
 		function getInnerComponent(widgetId) {
     		return {
@@ -125,12 +126,15 @@ module.exports = function(source) {
     		const wp = new Promise((resolve, reject) => {
         		vmp.then(($vm) => {
         			const store = $vm.$store;
-        			const ctx = store['__legoCtx'];
+        			const ctx = store.state['__legoCtx'];
         			const attrs = $vm.$attrs;
         			const widgetId = attrs['_widget_id'];
 
         			co(function* (){
-        				const genFn = dataGenerator.call(ctx, vm.$attrs);
+                        const genFn = function* (){
+                            const fn = dataGenerator.call(ctx, vm.$attrs);
+                            return yield fn;
+                        }
         				const ret = yield parallel(genFn, {
                 			timeout: 2000,
                 			fallback: null
@@ -153,8 +157,9 @@ module.exports = function(source) {
 
             			const mState = Object.assign(tplProps, storeConfig.state, data);
                 		store.registerModule(widgetId, Object.assign({}, storeConfig, {
-                			state
+                			mState
                 		}));
+                        coreWorker.storeWidgetState(ctx, widgetId, mState);
                 		resolve(getInnerComponent(widgetId));
             		}).catch((e) => {
             			// TODO，这里统一收集错误

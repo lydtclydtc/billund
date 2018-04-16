@@ -1,6 +1,6 @@
 {
-    "url": "/billund-next/startdard.html",
-    "action": "../action/startdard.js",
-    "page": "../page/startdard.vue",
-    "store": "../store/startdard.js"
+    "url": "/billund-next/standard.html",
+    "action": "../action/standard.js",
+    "page": "../page/standard.vue",
+    "store": "../store/standard.js"
 }

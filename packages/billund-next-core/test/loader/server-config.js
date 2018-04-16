@@ -4,8 +4,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        page: path.resolve(__dirname, './assest/page.vue'),
-        test: path.resolve(__dirname, './assest/test.vue')
+        test: path.resolve(__dirname, './assest/test.pageconfig.json')
     },
     output: {
         path: path.join(__dirname, './dist/server/'),
@@ -14,6 +13,28 @@ module.exports = {
     },
     module: {
         rules: [{
+            test: /\.js$/,
+            use: [{
+                loader: 'babel-loader',
+                options: {
+                    babelrc: false,
+                    presets: ['es2015-node', 'stage-0'],
+                    cacheDirectory: false
+                }
+            }]
+        }, {
+            test: /\.pageconfig\.json/,
+            use: [{
+                loader: 'babel-loader',
+                options: {
+                    babelrc: false,
+                    presets: ['es2015-node', 'stage-0'],
+                    cacheDirectory: false
+                }
+            }, {
+                loader: require.resolve('../../lib/build/loader/page-config-loader/index')
+            }]
+        }, {
             test: /\.vue$/,
             use: [{
                 loader: 'vue-loader',
@@ -45,10 +66,7 @@ module.exports = {
     },
     resolve: {
         // 添加后缀名顺序
-        extensions: ['.js', '.jsx', '.vue', '.less'],
-        alias: {
-            'billund-next-core': require.resolve('../../lib/server/index.js')
-        }
+        extensions: ['.js', '.jsx', '.vue', '.less']
     },
     target: 'node',
     devtool: false

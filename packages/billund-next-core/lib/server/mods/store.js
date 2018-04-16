@@ -16,7 +16,8 @@ function createStore(context, storeData, storeConfig) {
     // 允许storeConfig写一些静态资源的state
     const staticState = storeConfig.state;
     storeData = Object.assign({
-        __legoCtx: context
+        __legoCtx: context,
+        __widgetState: {}
     }, staticState, storeData);
 
     return new Vuex.Store(Object.assign({}, storeConfig, {

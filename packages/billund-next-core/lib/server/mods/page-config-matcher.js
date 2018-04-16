@@ -1,18 +1,11 @@
 'use strict';
 
 const path = require('path');
-const glob = require('glob');
 const constants = require('../../common/constants.js');
 const pageConfigFinder = require('../../common/page-config-finder');
 
 function* defaultAction() {
     return Object.assign({}, constants.DEFAULT_LEGO_CONFIG);
-}
-
-function findPageConfigs(dir, pattern) {
-    return glob.sync(pattern, {
-        cwd: dir
-    });
 }
 
 /**
@@ -34,7 +27,7 @@ function matchPageConfigs(config) {
     if (!config.serverDist) throw new Error('missing serverDist in page-config-matcher config');
     if (!config.browserDist) throw new Error('missing browserDist in page-config-matcher config');
 
-    const files = pageConfigFinder.getFiles(config);
+    const configs = pageConfigFinder.getConfigs(config);
 
     /*
         pageConfig的字段如下:
@@ -47,35 +40,38 @@ function matchPageConfigs(config) {
             staticMethods: [String] // 静态方法！只有前端能使用的方法
         }
      */
-    return files.reduce((arr, file) => {
-        /*
-            需要额外解析出
-            serverEntry
-            browserEntry
-            同时必须对必须字段做基本的检查 & 兼容
-         */
-        const serverEntryPath = path.resolve(config.serverDist, path.relative(config.pageConfigDir, file));
-        const browserEntryPath = path.resolve(config.browserDist, path.relative(config.pageConfigDir, file));
+    return configs.map((oriConfig) => {
+        if (!(oriConfig && oriConfig.serverBundle)) throw new Error(`require serverBundle failed in ${oriConfig.absolutePath}`);
+
+        const serverBundle = oriConfig.serverBundle;
+        const browserBundle = oriConfig.browserBundle;
         let serverEntry = null;
         try {
-            serverEntry = require(serverEntryPath);
+            serverEntry = require(serverBundle);
+            serverEntry = serverEntry.default || serverEntry;
         } catch (e) {
-            throw new Error(`require serverEntry failed in ${file},please check built bundle in ${serverEntryPath}`);
+            throw new Error(`require serverEntry failed in ${oriConfig.absolutePath},please check built bundle in ${serverBundle},
+                error: ${e.stack}`);
         }
-        if (!serverEntry.url) throw new Error(`no url defined in ${file}`);
+        if (!serverEntry.url) throw new Error(`no url defined in ${oriConfig.absolutePath}`);
         if (!serverEntry.action) {
             serverEntry.action = defaultAction;
         }
-        if (!serverEntry.page) throw new Error(`no page defined in ${file}`);
+        if (!serverEntry.page) throw new Error(`no page defined in ${oriConfig.absolutePath}`);
         if (serverEntry.layout) {
-            serverEntry.layout = path.resolve(file, serverEntry.layout);
+            serverEntry.layout = path.resolve(oriConfig.absolutePath, serverEntry.layout);
         }
 
-        return Object.assign(serverEntry, {
-            file,
-            browserEntryPath
+        const browserBundleForStyles = path.format(Object.assign({}, path.parse(browserBundle), {
+            ext: '.css'
+        }));
+
+        return Object.assign({}, serverEntry, {
+            file: oriConfig.absolutePath,
+            browserBundle,
+            browserBundleForStyles
         });
-    }, []);
+    });
 }
 
 module.exports = {
