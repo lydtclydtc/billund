@@ -5,7 +5,7 @@ const cwd = process.cwd();
 
 module.exports = {
     isDev: false,
-    serverDist: path.resolve(cwd, './serverDist/next/'), // server端打包地址
+    serverDist: path.resolve(cwd, './serverdist/next/'), // server端打包地址
     browserDist: path.resolve(cwd, './dist/next/'), // 浏览器端打包地址
     build: {
         server: {

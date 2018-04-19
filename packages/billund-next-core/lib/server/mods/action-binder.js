@@ -66,7 +66,7 @@ function updateRouter(config) {
     if (initedConfig && initedConfig.pageConfigs && initedConfig.pageConfigs.length) {
         const decache = require('decache');
         initedConfig.pageConfigs.forEach((pageConfig) => {
-            decache(pageConfig.serverEntry);
+            decache(pageConfig.serverBundle);
             console.log(`${pageConfig.file} decache.`);
         });
     }

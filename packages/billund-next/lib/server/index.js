@@ -7,6 +7,7 @@ const actionBinder = core.actionBinder;
 const coreWorker = core.coreWorker;
 const configMerger = core.configMerger;
 const builder = core.builder;
+const constants = core.constants;
 
 let appConfig = null;
 
@@ -18,15 +19,30 @@ let appConfig = null;
  */
 function* init($appConfig) {
     appConfig = configMerger($appConfig);
+
+    let builderIns = null;
     if (appConfig.isDev) {
-        const builderIns = builder.getInstance(appConfig);
+        builderIns = builder.getInstance(appConfig);
         yield builderIns.build();
     }
 
-    const pageConfigs = pageConfigMatcher.matchPageConfigs(appConfig);
+    let pageConfigs = pageConfigMatcher.matchPageConfigs(appConfig);
     actionBinder.bindRouter({
         pageConfigs
     });
+
+    if (appConfig.isDev) {
+        builderIns.on(constants.SERVER_COMPILER_UPDATE_FAIL, () => {
+            console.log('webpack in server bundle failed');
+        });
+        builderIns.on(constants.SERVER_COMPILER_UPDATE_SUCCESS, () => {
+            console.log('webpack in server bundle successed');
+            pageConfigs = pageConfigMatcher.matchPageConfigs(appConfig, true);
+            actionBinder.updateRouter({
+                pageConfigs
+            });
+        });
+    }
 
     const nextMiddleware = coreWorker.init(appConfig);
     /**
@@ -65,24 +81,6 @@ function* init($appConfig) {
     };
 }
 
-/**
- * 统一的更新操作
- *
- * @param {Object} config - 新的配置
- */
-function update(config) {
-    const pageConfigs = pageConfigMatcher.matchPageConfigs({
-        dir: appConfig.pageConfigDir,
-        pattern: appConfig.pageConfigPattern,
-        serverDist: appConfig.serverDist,
-        browserDist: appConfig.browserDist
-    });
-    actionBinder.updateRouter({
-        pageConfigs
-    });
-}
-
 module.exports = {
-    init,
-    update
+    init
 };

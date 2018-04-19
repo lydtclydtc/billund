@@ -20,14 +20,14 @@ function* defaultAction() {
  * }
  * @return {Array}
  */
-function matchPageConfigs(config) {
+function matchPageConfigs(config, shouldUpdate) {
     if (!config) throw new Error('missing page-config-matcher config');
     if (!config.pageConfigDir) throw new Error('missing pageConfigDir in page-config-matcher config');
     if (!config.pageConfigPattern) throw new Error('missing pageConfigPattern in page-config-matcher config');
     if (!config.serverDist) throw new Error('missing serverDist in page-config-matcher config');
     if (!config.browserDist) throw new Error('missing browserDist in page-config-matcher config');
 
-    const configs = pageConfigFinder.getConfigs(config);
+    const configs = pageConfigFinder.getConfigs(config, shouldUpdate);
 
     /*
         pageConfig的字段如下:
@@ -68,6 +68,7 @@ function matchPageConfigs(config) {
 
         return Object.assign({}, serverEntry, {
             file: oriConfig.absolutePath,
+            serverBundle,
             browserBundle,
             browserBundleForStyles
         });

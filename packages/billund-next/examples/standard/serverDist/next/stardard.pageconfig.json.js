@@ -543,6 +543,7 @@ Component.options.__file = "widget/header/index.vue"
 //
 //
 
+console.log(window.me);
 /* harmony default export */ __webpack_exports__["a"] = ({
 	props: {
 		msg: {
@@ -580,7 +581,7 @@ module.exports = require("billund-next-core");
 
 module.exports = function* () {
     const storeData = {
-        tag: `I'm standard`
+        tag: `I'm standard1`
     };
     this.legoConfig = {
         storeData
@@ -596,7 +597,7 @@ module.exports = function* () {
 
 module.exports = {
     state: {
-        pageName: 'standard'
+        pageName: 'standard1'
     },
     actions: {
         testAction() {
@@ -678,15 +679,15 @@ const core = __webpack_require__(7);
 const utils = core.utils;
 const parallel = core.parallel;
 const coreWorker = core.coreWorker;
+const errorComp = core.errorComp;
 
 const dataGenerator = function* (params) {
     return params;
 };
 
 const storeConfig = {};
-const template = __webpack_require__(2).default || __webpack_require__(2);
 
-function getInnerComponent(widgetId) {
+function getInnerComponent(widgetId, template) {
     return {
         components: {
             'wrapped-element': template
@@ -711,6 +712,22 @@ function getInnerComponent(widgetId) {
 function getComponent() {
     let vm = null; // 用以cache vue的上下文
     const listeners = [];
+    let template = null;
+    try {
+        template = __webpack_require__(2).default || __webpack_require__(2);
+    } catch (e) {}
+
+    const declareProps = template && template.props || {};
+    const tplProps = {};
+    const defaultPropKeys = utils.isArray(declareProps) ? declareProps : Object.keys(declareProps);
+    defaultPropKeys.forEach(propKey => {
+        const prop = declareProps[propKey];
+        if (!(utils.isObject(prop) && prop.default !== undefined)) {
+            tplProps[propKey] = null;
+            return true;
+        }
+        tplProps[propKey] = undefined;
+    });
 
     function getVm(cb) {
         if (!vm) {
@@ -737,14 +754,16 @@ function getComponent() {
 
     const wp = new Promise((resolve, reject) => {
         vmp.then($vm => {
+            if (!template) throw new Error('require template failed in /Users/robin/dpfe/billund/packages/billund-next/examples/standard/widget/body/index.widget.json');
+
             const store = $vm.$store;
             const ctx = store.state['__legoCtx'];
             const attrs = $vm.$attrs;
             const widgetId = attrs['_widget_id'];
 
-            co(function* () {
+            return co(function* () {
                 const genFn = function* () {
-                    const fn = dataGenerator.call(ctx, vm.$attrs);
+                    const fn = dataGenerator.call(ctx, $vm.$props);
                     return yield fn;
                 };
                 const ret = yield parallel(genFn, {
@@ -755,30 +774,23 @@ function getComponent() {
 
                 return ret.result;
             }).then(data => {
-                const declareProps = template.props || {};
-                const tplProps = {};
-                const defaultPropKeys = utils.isArray(declareProps) ? declareProps : Object.keys(declareProps);
-                defaultPropKeys.forEach(propKey => {
-                    const prop = declareProps[propKey];
-                    if (!(utils.isObject(prop) && prop.default !== undefined)) {
-                        tplProps[propKey] = null;
-                        return true;
-                    }
-                    tplProps[propKey] = undefined;
-                });
-
-                const mState = _extends(tplProps, storeConfig.state, data);
+                const mState = _extends({}, tplProps, storeConfig.state, data);
                 store.registerModule(widgetId, _extends({}, storeConfig, {
                     mState
                 }));
                 coreWorker.storeWidgetState(ctx, widgetId, mState);
-                resolve(getInnerComponent(widgetId));
-            }).catch(e => {
-                // TODO，这里统一收集错误
+                resolve(getInnerComponent(widgetId, template));
             });
+        }).catch(e => {
+            console.error(e);
+            const store = vm.$store;
+            const ctx = store.state['__legoCtx'];
+            coreWorker.collectErrors(ctx, 'widget', e);
+            resolve(_extends({}, errorComp));
         });
     });
     return {
+        props: tplProps,
         // 这里可以考虑用高级异步组件
         components: {
             'wrapped-element': resolve => {
@@ -788,7 +800,7 @@ function getComponent() {
         render(h) {
             setVm(this);
             return h('wrapped-element', {
-                attrs: this.$attrs
+                attrs: this.$props
             });
         }
     };
@@ -813,15 +825,15 @@ const core = __webpack_require__(7);
 const utils = core.utils;
 const parallel = core.parallel;
 const coreWorker = core.coreWorker;
+const errorComp = core.errorComp;
 
 const dataGenerator = function* (params) {
     return params;
 };
 
 const storeConfig = {};
-const template = __webpack_require__(3).default || __webpack_require__(3);
 
-function getInnerComponent(widgetId) {
+function getInnerComponent(widgetId, template) {
     return {
         components: {
             'wrapped-element': template
@@ -846,6 +858,22 @@ function getInnerComponent(widgetId) {
 function getComponent() {
     let vm = null; // 用以cache vue的上下文
     const listeners = [];
+    let template = null;
+    try {
+        template = __webpack_require__(3).default || __webpack_require__(3);
+    } catch (e) {}
+
+    const declareProps = template && template.props || {};
+    const tplProps = {};
+    const defaultPropKeys = utils.isArray(declareProps) ? declareProps : Object.keys(declareProps);
+    defaultPropKeys.forEach(propKey => {
+        const prop = declareProps[propKey];
+        if (!(utils.isObject(prop) && prop.default !== undefined)) {
+            tplProps[propKey] = null;
+            return true;
+        }
+        tplProps[propKey] = undefined;
+    });
 
     function getVm(cb) {
         if (!vm) {
@@ -872,14 +900,16 @@ function getComponent() {
 
     const wp = new Promise((resolve, reject) => {
         vmp.then($vm => {
+            if (!template) throw new Error('require template failed in /Users/robin/dpfe/billund/packages/billund-next/examples/standard/widget/header/index.widget.json');
+
             const store = $vm.$store;
             const ctx = store.state['__legoCtx'];
             const attrs = $vm.$attrs;
             const widgetId = attrs['_widget_id'];
 
-            co(function* () {
+            return co(function* () {
                 const genFn = function* () {
-                    const fn = dataGenerator.call(ctx, vm.$attrs);
+                    const fn = dataGenerator.call(ctx, $vm.$props);
                     return yield fn;
                 };
                 const ret = yield parallel(genFn, {
@@ -890,30 +920,23 @@ function getComponent() {
 
                 return ret.result;
             }).then(data => {
-                const declareProps = template.props || {};
-                const tplProps = {};
-                const defaultPropKeys = utils.isArray(declareProps) ? declareProps : Object.keys(declareProps);
-                defaultPropKeys.forEach(propKey => {
-                    const prop = declareProps[propKey];
-                    if (!(utils.isObject(prop) && prop.default !== undefined)) {
-                        tplProps[propKey] = null;
-                        return true;
-                    }
-                    tplProps[propKey] = undefined;
-                });
-
-                const mState = _extends(tplProps, storeConfig.state, data);
+                const mState = _extends({}, tplProps, storeConfig.state, data);
                 store.registerModule(widgetId, _extends({}, storeConfig, {
                     mState
                 }));
                 coreWorker.storeWidgetState(ctx, widgetId, mState);
-                resolve(getInnerComponent(widgetId));
-            }).catch(e => {
-                // TODO，这里统一收集错误
+                resolve(getInnerComponent(widgetId, template));
             });
+        }).catch(e => {
+            console.error(e);
+            const store = vm.$store;
+            const ctx = store.state['__legoCtx'];
+            coreWorker.collectErrors(ctx, 'widget', e);
+            resolve(_extends({}, errorComp));
         });
     });
     return {
+        props: tplProps,
         // 这里可以考虑用高级异步组件
         components: {
             'wrapped-element': resolve => {
@@ -923,7 +946,7 @@ function getComponent() {
         render(h) {
             setVm(this);
             return h('wrapped-element', {
-                attrs: this.$attrs
+                attrs: this.$props
             });
         }
     };

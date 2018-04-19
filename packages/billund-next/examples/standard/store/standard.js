@@ -2,7 +2,7 @@
 
 module.exports = {
     state: {
-        pageName: 'standard',
+        pageName: 'standard1'
     },
     actions: {
         testAction() {

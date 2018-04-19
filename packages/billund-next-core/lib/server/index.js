@@ -8,14 +8,16 @@ const actionBinder = require('./mods/action-binder');
 const parallel = require('./mods/parallel');
 const utils = require('../common/utils.js');
 const builder = require('../build/index');
+const errorComp = require('./mods/error-widget');
 
 module.exports = {
-	constants,
+    constants,
     configMerger,
     parallel,
     pageConfigMatcher,
     actionBinder,
     coreWorker,
     utils,
-    builder
+    builder,
+    errorComp
 };

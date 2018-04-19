@@ -1,7 +1,9 @@
 'use strict';
 
 const _ = require('lodash');
-const STATE = require('billund-enums').state;
+const {
+    KEY_STORE_GLOBAL_STATE
+} = require('../../../../common/constants');
 
 /**
  * 生成对应的pageTitle
@@ -16,6 +18,6 @@ module.exports = function*(config) {
     const unsafeStr = JSON.stringify(storeData);
     const safeStr = encodeURIComponent(unsafeStr);
     return {
-        result: `<script class="lego-initial-state">window.${STATE.INITIAL_STATE}=JSON.parse(decodeURIComponent("${safeStr}"))</script>`
+        result: `<script class="lego-initial-state">window.${KEY_STORE_GLOBAL_STATE}=JSON.parse(decodeURIComponent("${safeStr}"))</script>`
     };
 };

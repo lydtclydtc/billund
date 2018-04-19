@@ -19,9 +19,10 @@ const renderer = require('vue-server-renderer').createRenderer({
  * @param {Object} context - koa上下文
  * @param {Object} pageConfig - 页面的配置
  * @param {type} store - vuex store
+ * @param {Function} errorCollector - 错误收集函数
  * @return {String}
  */
-function* render(context, pageConfig, store) {
+function* render(context, pageConfig, store, errorCollector) {
     if (!pageConfig.page) throw new Error(`no page defined in ${pageConfig.file}`);
     const component = Object.assign({}, pageConfig.page);
     component.store = store;
@@ -44,8 +45,8 @@ function* render(context, pageConfig, store) {
             }
             resolve(html);
         });
-    }).catch(() => {
-        // 渲染失败，展示一个loading页
+    }).catch((e) => {
+        errorCollector(context, 'page', e);
         return '<div>ssr失败，页面正在加载中</div>';
     });
 }

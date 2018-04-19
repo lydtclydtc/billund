@@ -70,7 +70,7 @@ function* execute(context) {
     const pageConfig = legoConfig['__pageConfig'];
 
     const store = storeUtil.createStore(context, legoConfig.storeData, pageConfig.store || {});
-    const pageHtml = yield renderUtil.render(context, pageConfig, store);
+    const pageHtml = yield renderUtil.render(context, pageConfig, store, collectErrors);
     const staticResources = getStaticResources(context, pageConfig);
 
     let pluginConfig = {
@@ -181,7 +181,26 @@ function storeWidgetState(ctx, widgetId, state) {
     });
 }
 
+function collectErrors(ctx, tag, err) {
+    /*
+        收集错误类型
+        tag分为两种
+        1: page
+        2: widget
+     */
+    if (tag === 'page') {
+        ctx.legoConfig['__pageError'] = err;
+    }
+    if (tag === 'widget') {
+        if (!ctx.legoConfig['__widgetError']) {
+            ctx.legoConfig['__widgetError'] = [];
+        }
+        ctx.legoConfig['__widgetError'].push(err);
+    }
+}
+
 module.exports = {
     init,
-    storeWidgetState
+    storeWidgetState,
+    collectErrors
 };
